@@ -1,3 +1,4 @@
+document.body.classList.add("js-enabled");
 const header = document.querySelector("[data-header]");
 const menuButton = document.querySelector("[data-menu-button]");
 const tabs = document.querySelectorAll("[data-product]");
@@ -18,6 +19,96 @@ const demoMessage = document.querySelector("[data-demo-message]");
 
 let products = {};
 let activeProductId = "law";
+let activeHeroIndex = 0;
+let heroTimer;
+
+const heroArt = document.querySelector("[data-hero-art]");
+const heroKicker = document.querySelector("[data-hero-kicker]");
+const heroTitle = document.querySelector("[data-hero-title]");
+const heroCopy = document.querySelector("[data-hero-copy]");
+const heroPrimary = document.querySelector("[data-hero-primary]");
+const heroSecondary = document.querySelector("[data-hero-secondary]");
+const heroSlideButtons = document.querySelectorAll("[data-hero-slide]");
+
+const heroSlides = [
+  {
+    image: "assets/bizyako-hero-vibrant.png",
+    kicker: "Your Business, Powered by AI.",
+    status: "Unified suite live",
+    title: "Business software that feels built for you.",
+    copy: "Modern CRM, ERP, POS, analytics, ISP management, and AI agent tools designed around real business workflows.",
+    primary: "Explore products",
+    secondary: "Book a demo",
+    primaryHref: "#products",
+    secondaryHref: "#contact",
+  },
+  {
+    image: "assets/bizyako-hero.png",
+    kicker: "Automation without the chaos",
+    status: "AI workflows ready",
+    title: "Turn repetitive operations into guided, intelligent workflows.",
+    copy: "BizYako connects intake, approvals, reminders, reports, tickets, billing, and customer follow-up so teams spend less time chasing work.",
+    primary: "See AI agents",
+    secondary: "Map my workflow",
+    primaryHref: "#products",
+    secondaryHref: "#process",
+    product: "agents",
+  },
+  {
+    image: "assets/bizyako-hero-vibrant.png",
+    kicker: "Data that managers can act on",
+    status: "Decision layer online",
+    title: "From POS to ERP to analytics, your business finally speaks one language.",
+    copy: "Give every product a clean data layer with dashboards, alerts, role views, and executive summaries for faster decisions.",
+    primary: "View analytics",
+    secondary: "Start a sprint",
+    primaryHref: "#products",
+    secondaryHref: "#contact",
+    product: "analytics",
+  },
+];
+
+
+const setHeroSlide = (index) => {
+  const slide = heroSlides[index % heroSlides.length];
+  activeHeroIndex = index % heroSlides.length;
+  document.querySelector('.hero')?.classList.add('hero-transitioning');
+
+  window.setTimeout(() => {
+    if (heroArt) heroArt.src = slide.image;
+    if (heroKicker) heroKicker.textContent = slide.kicker;
+    if (heroTitle) heroTitle.textContent = slide.title;
+    if (heroCopy) heroCopy.textContent = slide.copy;
+    if (heroPrimary) {
+      heroPrimary.textContent = slide.primary;
+      heroPrimary.href = slide.primaryHref;
+      if (slide.product) heroPrimary.dataset.consoleProduct = slide.product;
+      else delete heroPrimary.dataset.consoleProduct;
+    }
+    if (heroSecondary) {
+      heroSecondary.textContent = slide.secondary;
+      heroSecondary.href = slide.secondaryHref;
+    }
+    if (apiStatus) apiStatus.textContent = slide.status;
+    heroSlideButtons.forEach((button, buttonIndex) => {
+      button.classList.toggle('active', buttonIndex === activeHeroIndex);
+      button.setAttribute('aria-pressed', buttonIndex === activeHeroIndex ? 'true' : 'false');
+    });
+    document.querySelector('.hero')?.classList.remove('hero-transitioning');
+  }, 160);
+};
+
+const startHeroCarousel = () => {
+  window.clearInterval(heroTimer);
+  heroTimer = window.setInterval(() => setHeroSlide((activeHeroIndex + 1) % heroSlides.length), 6500);
+};
+
+heroSlideButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    setHeroSlide(Number(button.dataset.heroSlide || 0));
+    startHeroCarousel();
+  });
+});
 
 const escapeHtml = (value) =>
   String(value).replace(/[&<>"']/g, (character) => {
@@ -198,9 +289,9 @@ const syncBackendStatus = async () => {
   try {
     const response = await fetch("/api/health");
     const health = await response.json();
-    apiStatus.textContent = health.ok ? "Backend live" : "Backend checking";
+    apiStatus.dataset.backendState = health.ok ? "Backend live" : "Backend checking";
   } catch (error) {
-    apiStatus.textContent = "Frontend preview";
+    apiStatus.dataset.backendState = "Frontend preview";
   }
 };
 

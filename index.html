@@ -36,7 +36,7 @@
 
     <main id="top">
       <section class="hero">
-        <img class="hero-art" src="assets/bizyako-hero-vibrant.png" alt="" />
+        <img class="hero-art" src="assets/bizyako-hero-vibrant.png" alt="" data-hero-art />
         <div class="hero-overlay"></div>
         <div class="hero-grid-lines" aria-hidden="true"></div>
         <div class="hero-content upgraded-hero">
@@ -44,16 +44,21 @@
             <div class="hero-status-pill">
               <span class="pulse-dot"></span>
               <span>BizYako AI business suite</span>
-              <strong data-api-status>Backend syncing</strong>
+              <strong data-api-status data-hero-status>Backend syncing</strong>
             </div>
-            <p class="eyebrow">Your Business, Powered by AI.</p>
-            <h1>Business software that feels built for you.</h1>
-            <p class="hero-copy">
+            <p class="eyebrow" data-hero-kicker>Your Business, Powered by AI.</p>
+            <h1 data-hero-title>Business software that feels built for you.</h1>
+            <p class="hero-copy" data-hero-copy>
               Modern CRM, ERP, POS, analytics, ISP management, and AI agent tools designed around real business workflows.
             </p>
             <div class="hero-actions">
-              <a class="button primary magnetic" href="#products">Explore products</a>
-              <a class="button secondary" href="#contact">Book a demo</a>
+              <a class="button primary magnetic" href="#products" data-hero-primary>Explore products</a>
+              <a class="button secondary" href="#contact" data-hero-secondary>Book a demo</a>
+            </div>
+            <div class="hero-carousel-controls" aria-label="Hero carousel controls">
+              <button class="active" type="button" data-hero-slide="0"><span>01</span>Suite</button>
+              <button type="button" data-hero-slide="1"><span>02</span>Automation</button>
+              <button type="button" data-hero-slide="2"><span>03</span>Intelligence</button>
             </div>
             <div class="signal-row enhanced-signals" aria-label="BizYako highlights">
               <button type="button" data-console-product="law">Law CRM</button>
