@@ -28,9 +28,10 @@ const heroTitle = document.querySelector("[data-hero-title]");
 const heroCopy = document.querySelector("[data-hero-copy]");
 const heroPrimary = document.querySelector("[data-hero-primary]");
 const heroSecondary = document.querySelector("[data-hero-secondary]");
-const heroSlideButtons = document.querySelectorAll("[data-hero-slide]");
+const heroControls = document.querySelector("[data-hero-controls]");
+let heroSlideButtons = document.querySelectorAll("[data-hero-slide]");
 
-const heroSlides = [
+let heroSlides = [
   {
     image: "assets/bizyako-hero-vibrant.png",
     kicker: "Your Business, Powered by AI.",
@@ -70,6 +71,7 @@ const heroSlides = [
 
 
 const setHeroSlide = (index) => {
+  if (!heroSlides.length) return;
   const slide = heroSlides[index % heroSlides.length];
   activeHeroIndex = index % heroSlides.length;
   document.querySelector('.hero')?.classList.add('hero-transitioning');
@@ -103,12 +105,36 @@ const startHeroCarousel = () => {
   heroTimer = window.setInterval(() => setHeroSlide((activeHeroIndex + 1) % heroSlides.length), 6500);
 };
 
-heroSlideButtons.forEach((button) => {
-  button.addEventListener('click', () => {
-    setHeroSlide(Number(button.dataset.heroSlide || 0));
-    startHeroCarousel();
+const bindHeroSlideButtons = () => {
+  heroSlideButtons = document.querySelectorAll("[data-hero-slide]");
+  heroSlideButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      setHeroSlide(Number(button.dataset.heroSlide || 0));
+      startHeroCarousel();
+    });
   });
-});
+};
+
+const renderHeroControls = () => {
+  if (!heroControls) return;
+  heroControls.innerHTML = heroSlides
+    .map((slide, index) => {
+      const activeClass = index === activeHeroIndex ? "active" : "";
+      const label = escapeHtml(slide.label || slide.id || "Slide " + (index + 1));
+      return '<button class="' + activeClass + '" type="button" data-hero-slide="' + index + '"><span>' + String(index + 1).padStart(2, "0") + '</span>' + label + '</button>';
+    })
+    .join("");
+  bindHeroSlideButtons();
+};
+
+const hydrateHeroSlides = (slides) => {
+  if (!Array.isArray(slides) || slides.length === 0) return;
+  heroSlides = slides.slice(0, 5);
+  activeHeroIndex = 0;
+  renderHeroControls();
+  setHeroSlide(0);
+  startHeroCarousel();
+};
 
 const escapeHtml = (value) =>
   String(value).replace(/[&<>"']/g, (character) => {

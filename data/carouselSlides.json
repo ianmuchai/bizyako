@@ -1,0 +1,71 @@
+[
+  {
+    "id": "suite",
+    "label": "Suite",
+    "image": "assets/bizyako-hero-vibrant.png",
+    "kicker": "Your Business, Powered by AI.",
+    "status": "Unified suite live",
+    "title": "Business software that feels built for you.",
+    "copy": "Modern CRM, ERP, POS, analytics, ISP management, and AI agent tools designed around real business workflows.",
+    "primary": "Explore products",
+    "secondary": "Book a demo",
+    "primaryHref": "#products",
+    "secondaryHref": "#contact"
+  },
+  {
+    "id": "automation",
+    "label": "Automation",
+    "image": "assets/bizyako-hero.png",
+    "kicker": "Automation without the chaos",
+    "status": "AI workflows ready",
+    "title": "Turn repetitive operations into guided, intelligent workflows.",
+    "copy": "BizYako connects intake, approvals, reminders, reports, tickets, billing, and customer follow-up so teams spend less time chasing work.",
+    "primary": "See AI agents",
+    "secondary": "Map my workflow",
+    "primaryHref": "#products",
+    "secondaryHref": "#process",
+    "product": "agents"
+  },
+  {
+    "id": "intelligence",
+    "label": "Intelligence",
+    "image": "assets/bizyako-hero-vibrant.png",
+    "kicker": "Data that managers can act on",
+    "status": "Decision layer online",
+    "title": "From POS to ERP to analytics, your business finally speaks one language.",
+    "copy": "Give every product a clean data layer with dashboards, alerts, role views, and executive summaries for faster decisions.",
+    "primary": "View analytics",
+    "secondary": "Start a sprint",
+    "primaryHref": "#products",
+    "secondaryHref": "#contact",
+    "product": "analytics"
+  },
+  {
+    "id": "operations",
+    "label": "Operations",
+    "image": "assets/bizyako-hero.png",
+    "kicker": "Operations connected end to end",
+    "status": "ERP layer active",
+    "title": "Run approvals, stock, finance, teams, and reports from one connected workspace.",
+    "copy": "Launch the modules you need first, then expand into procurement, HR, inventory, accounting, customer records, and management intelligence.",
+    "primary": "Explore ERP",
+    "secondary": "Talk to us",
+    "primaryHref": "#products",
+    "secondaryHref": "#contact",
+    "product": "erp"
+  },
+  {
+    "id": "retail",
+    "label": "Retail",
+    "image": "assets/bizyako-hero-vibrant.png",
+    "kicker": "Sales, stock, and branches in sync",
+    "status": "POS stack ready",
+    "title": "Give front-office teams speed while management gets real visibility.",
+    "copy": "BizYako POS connects checkout, inventory, staff actions, payments, branch reporting, loyalty, and analytics in one practical flow.",
+    "primary": "See POS",
+    "secondary": "Book a demo",
+    "primaryHref": "#products",
+    "secondaryHref": "#contact",
+    "product": "pos"
+  }
+]

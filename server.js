@@ -5,7 +5,7 @@ const path = require("path");
 const PORT = process.env.PORT || 5173;
 const PUBLIC_ROOT = __dirname;
 
-const { getSitePayload, normalizeLead } = require("./data/siteData");
+const { getSitePayload, normalizeLead, getCarouselSlides, posterSpecs, saveCarouselSlides } = require("./data/siteData");
 
 const mimeTypes = {
   ".html": "text/html; charset=utf-8",
@@ -80,6 +80,29 @@ const server = http.createServer(async (req, res) => {
       tagline: "Your Business, Powered by AI.",
       ...getSitePayload(),
     });
+    return;
+  }
+
+
+  if (url.pathname === "/api/carousel") {
+    if (req.method === "GET") {
+      sendJson(res, 200, { slides: getCarouselSlides(), posterSpecs });
+      return;
+    }
+
+    if (req.method === "POST") {
+      try {
+        const body = await collectBody(req);
+        const payload = JSON.parse(body || "{}");
+        const slides = saveCarouselSlides(payload.slides || []);
+        sendJson(res, 200, { ok: true, message: "Carousel posters saved locally. Push to GitHub/Vercel to publish.", slides, posterSpecs });
+      } catch (error) {
+        sendJson(res, 400, { ok: false, message: "Invalid carousel payload." });
+      }
+      return;
+    }
+
+    sendJson(res, 405, { ok: false, message: "Method not allowed." });
     return;
   }
 

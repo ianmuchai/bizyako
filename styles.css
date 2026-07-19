@@ -481,3 +481,83 @@ body.js-enabled .reveal-section.is-visible {
   opacity: 1;
   transform: translateY(0);
 }
+
+/* Hidden carousel admin */
+.admin-page {
+  min-height: 100vh;
+  color: #eefdfa;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(8,184,147,0.24), transparent 28rem),
+    radial-gradient(circle at 88% 12%, rgba(39,167,223,0.18), transparent 26rem),
+    #041016;
+}
+.admin-shell {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 40px 0 120px;
+}
+.admin-hero-card,
+.admin-slide-card,
+.admin-save-bar,
+.admin-spec-grid article {
+  border: 1px solid rgba(157,233,209,0.18);
+  background: rgba(255,255,255,0.08);
+  box-shadow: 0 24px 80px rgba(0,0,0,0.24);
+  backdrop-filter: blur(18px);
+}
+.admin-hero-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 18px;
+  padding: clamp(22px,4vw,42px);
+  border-radius: 30px;
+}
+.admin-hero-card h1 { margin: 0; color: #fff; font-size: clamp(2rem,4vw,4rem); }
+.admin-hero-card p:not(.eyebrow) { margin: 10px 0 0; color: rgba(255,255,255,0.72); }
+.admin-spec-grid {
+  display: grid;
+  grid-template-columns: repeat(4,minmax(0,1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.admin-spec-grid article { padding: 18px; border-radius: 20px; }
+.admin-spec-grid span { display: block; color: var(--mint); font-size: .8rem; font-weight: 850; text-transform: uppercase; }
+.admin-spec-grid strong { display: block; margin-top: 8px; color: #fff; line-height: 1.3; }
+.admin-editor-grid { display: grid; gap: 18px; }
+.admin-slide-card {
+  display: grid;
+  grid-template-columns: minmax(320px,.72fr) minmax(0,1fr);
+  gap: 18px;
+  padding: 18px;
+  border-radius: 26px;
+}
+.admin-slide-preview img { width: 100%; aspect-ratio: 16 / 9; border-radius: 20px; background: #06131b; object-fit: cover; }
+.admin-slide-fields { display: grid; gap: 12px; }
+.admin-slide-fields h2 { margin: 0; color: #fff; }
+.admin-slide-fields label { color: rgba(255,255,255,0.86); }
+.admin-slide-fields input,
+.admin-slide-fields textarea {
+  color: #fff;
+  background: rgba(0,0,0,0.24);
+  border-color: rgba(157,233,209,0.2);
+}
+.admin-field-row { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+.admin-save-bar {
+  position: sticky;
+  bottom: 16px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 20px;
+  padding: 14px;
+  border-radius: 22px;
+}
+.admin-save-bar p { margin: 0; color: rgba(255,255,255,.76); }
+@media (max-width: 860px) {
+  .admin-hero-card,.admin-save-bar { display: grid; }
+  .admin-spec-grid,.admin-slide-card,.admin-field-row { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BizYako Carousel Admin</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="admin-page">
+    <main class="admin-shell">
+      <section class="admin-hero-card">
+        <div>
+          <p class="eyebrow">Incognito Admin</p>
+          <h1>Carousel poster manager</h1>
+          <p>Manage the 5 hero carousel posters. This page is hidden from site navigation.</p>
+        </div>
+        <a class="button secondary" href="/">Back to site</a>
+      </section>
+
+      <section class="admin-spec-grid" data-poster-specs></section>
+
+      <section class="admin-editor-grid" data-slide-editor></section>
+
+      <div class="admin-save-bar">
+        <p data-admin-status>Changes save to the local BizYako project. Push to GitHub/Vercel to publish.</p>
+        <button class="button primary" type="button" data-save-carousel>Save carousel posters</button>
+      </div>
+    </main>
+    <script src="admin.js"></script>
+  </body>
+</html>

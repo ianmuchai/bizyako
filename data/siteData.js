@@ -1,3 +1,8 @@
+const fs = require("fs");
+const path = require("path");
+
+const carouselPath = path.join(__dirname, "carouselSlides.json");
+
 const products = [
   {
     id: "law",
@@ -63,6 +68,47 @@ const metrics = {
   services: ["CRM", "ERP", "POS", "Analytics", "ISP Ops", "AI Agents", "AI Automation"],
 };
 
+const posterSpecs = {
+  recommended: "1920 x 1080 px",
+  ratio: "16:9 landscape",
+  safeZone: "Keep important text inside the center 60% width and center 72% height.",
+  formats: "PNG, JPG, JPEG, WebP, AVIF, or SVG",
+  maxGuidance: "Use compressed WebP/JPG under 500 KB where possible. PNG is okay for graphic posters.",
+};
+
+function getCarouselSlides() {
+  try {
+    const parsed = JSON.parse(fs.readFileSync(carouselPath, "utf8"));
+    return Array.isArray(parsed) ? parsed.slice(0, 5) : [];
+  } catch (error) {
+    return [];
+  }
+}
+
+function normalizeCarouselSlides(items = []) {
+  const slides = Array.isArray(items) ? items.slice(0, 5) : [];
+  return slides.map((slide, index) => ({
+    id: String(slide.id || "slide-" + (index + 1)).toLowerCase().replace(/[^a-z0-9-]+/g, "-"),
+    label: String(slide.label || "Slide " + (index + 1)).trim(),
+    image: String(slide.image || "assets/bizyako-hero-vibrant.png").trim(),
+    kicker: String(slide.kicker || "Your Business, Powered by AI.").trim(),
+    status: String(slide.status || "Poster ready").trim(),
+    title: String(slide.title || "Business software that feels built for you.").trim(),
+    copy: String(slide.copy || "Modern systems for real business workflows.").trim(),
+    primary: String(slide.primary || "Explore products").trim(),
+    secondary: String(slide.secondary || "Book a demo").trim(),
+    primaryHref: String(slide.primaryHref || "#products").trim(),
+    secondaryHref: String(slide.secondaryHref || "#contact").trim(),
+    product: slide.product ? String(slide.product).trim() : undefined,
+  }));
+}
+
+function saveCarouselSlides(items = []) {
+  const slides = normalizeCarouselSlides(items);
+  fs.writeFileSync(carouselPath, JSON.stringify(slides, null, 2) + "\n");
+  return slides;
+}
+
 function getSitePayload() {
   return {
     brand: "bizYako",
@@ -70,6 +116,8 @@ function getSitePayload() {
     products,
     industries,
     metrics,
+    carouselSlides: getCarouselSlides(),
+    posterSpecs,
   };
 }
 
@@ -95,4 +143,4 @@ function normalizeLead(payload = {}) {
   };
 }
 
-module.exports = { products, industries, metrics, getSitePayload, normalizeLead };
+module.exports = { products, industries, metrics, getSitePayload, normalizeLead, getCarouselSlides, saveCarouselSlides, posterSpecs };
