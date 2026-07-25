@@ -29,15 +29,29 @@
           <p class="eyebrow" data-demo-kicker>Product demo</p>
           <h1 data-demo-title>BizYako product preview</h1>
           <p data-demo-text>Choose a BizYako product and preview how it supports business workflows.</p>
+          <nav class="demo-product-switcher" aria-label="Choose product demo" data-demo-switcher></nav>
+          <div class="demo-stat-row" data-demo-stats></div>
           <div class="hero-actions">
             <a class="button primary" href="index.html#contact" data-demo-cta>Request guided demo</a>
             <a class="button secondary" href="mailto:hello@bizyako.com">Email BizYako</a>
           </div>
         </div>
-        <aside class="demo-product-console" aria-label="Product preview interface">
-          <div class="panel-top"><span></span><span></span><span></span></div>
+        <aside class="demo-product-console premium-console" aria-label="Product preview interface">
+          <div class="console-topline">
+            <span data-console-label>Product workspace</span>
+            <strong>Preview mode</strong>
+          </div>
+          <div class="demo-live-card">
+            <div>
+              <small data-live-kicker>Workflow health</small>
+              <strong data-live-score>92%</strong>
+            </div>
+            <span data-live-label>Ready for guided walkthrough</span>
+          </div>
           <div class="demo-screen-grid">
-            <div class="demo-screen-side"></div>
+            <div class="demo-screen-side">
+              <span></span><span></span><span></span><span></span>
+            </div>
             <div class="demo-screen-main">
               <div class="demo-screen-line wide"></div>
               <div class="demo-screen-line"></div>
@@ -51,9 +65,17 @@
       <section class="demo-page-body">
         <div class="section-heading compact">
           <p class="eyebrow">Demo highlights</p>
-          <h2>What this product demo should show.</h2>
+          <h2>What you can inspect before a guided walkthrough.</h2>
         </div>
         <div class="demo-detail-grid" data-demo-points></div>
+      </section>
+
+      <section class="demo-workflow-section">
+        <div class="section-heading compact">
+          <p class="eyebrow">Workflow Preview</p>
+          <h2>See the product as a working business flow.</h2>
+        </div>
+        <div class="demo-workflow-grid" data-demo-workflows></div>
       </section>
 
       <section class="demo-page-cta">
@@ -63,6 +85,7 @@
           <p>Send BizYako your product direction, and we will help map the right modules, integrations, dashboards, and launch path.</p>
         </div>
         <div class="demo-contact-card">
+          <span class="demo-contact-badge">Launch-ready contact</span>
           <a href="mailto:hello@bizyako.com">hello@bizyako.com</a>
           <span>PO Box 2086 Karen</span>
           <a href="https://x.com/bizYako" target="_blank" rel="noopener">X: @bizYako</a>
@@ -71,7 +94,7 @@
       </section>
     </main>
 
-    <footer class="footer">
+    <footer class="footer premium-footer">
       <a class="brand" href="index.html#top" aria-label="BizYako home">
         <span class="brand-logo"><img src="assets/bizyako-logo.png" alt="BizYako logo" /></span><span>bizYako</span>
       </a>

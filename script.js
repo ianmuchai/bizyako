@@ -28,6 +28,7 @@ const openLeadButtons = document.querySelectorAll("[data-open-lead-builder]");
 let products = {};
 let activeProductId = "law";
 let activeHeroIndex = 0;
+let pendingDemoUrl = "product-demo.html?product=law";
 let heroTimer;
 
 const heroArt = document.querySelector("[data-hero-art]");
@@ -255,6 +256,7 @@ const openDemoModal = () => {
 
   if (demoProductName) demoProductName.textContent = productLabel(product);
   if (demoNeed) demoNeed.value = `${product.title} demo`;
+  pendingDemoUrl = product.demoUrl || `product-demo.html?product=${activeProductId}`;
   if (demoMessage) demoMessage.value = `I would like to sign up and watch a demo for: ${product.title}`;
 
   demoModal.classList.add("open");
@@ -585,12 +587,11 @@ demoForm?.addEventListener("submit", async (event) => {
     const result = await response.json();
     button.textContent = result.ok ? "Demo request sent" : "Check your details";
     if (result.ok) {
+      button.textContent = "Opening demo preview...";
       setTimeout(() => {
         demoForm.reset();
-        closeDemoModal();
-        button.textContent = "Sign up and unlock demo";
-        button.disabled = false;
-      }, 1400);
+        window.location.href = pendingDemoUrl;
+      }, 900);
       return;
     }
   } catch (error) {
@@ -637,6 +638,8 @@ startHeroCarousel();
 loadSiteData();
 syncBackendStatus();
 revealSections();
+
+
 
 
 
