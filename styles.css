@@ -590,13 +590,30 @@ body.js-enabled .reveal-section.is-visible {
   transform: translateY(-3px);
   box-shadow: 0 24px 70px rgba(8,184,147,0.24);
 }
-.support-action span {
-  font-size: .82rem;
-  font-weight: 900;
-  letter-spacing: 0;
+.support-action svg {
+  width: 28px;
+  height: 28px;
+  display: block;
+  filter: drop-shadow(0 8px 16px rgba(0,0,0,0.18));
 }
-.whatsapp-action { background: linear-gradient(145deg,#21c766,#0a9f56); }
+.support-action:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(157,233,209,0.24), 0 24px 70px rgba(8,184,147,0.24);
+}
+.whatsapp-action { background: linear-gradient(145deg,#25d366,#0a9f56); }
 .chat-action { background: linear-gradient(145deg,var(--teal),var(--blue)); }
+.whatsapp-action::before,
+.chat-action::before {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border-radius: 15px;
+  background: linear-gradient(145deg, rgba(255,255,255,0.28), transparent 58%);
+  pointer-events: none;
+}
+.support-action { position: relative; overflow: hidden; }
+.support-action svg { position: relative; z-index: 1; }
+
 .chat-panel {
   position: fixed;
   right: 94px;
@@ -777,6 +794,7 @@ body.js-enabled .reveal-section.is-visible {
     grid-template-columns: repeat(2, 54px);
   }
   .support-action { width: 54px; height: 54px; border-radius: 18px; }
+  .support-action svg { width: 26px; height: 26px; }
   .chat-panel {
     right: 12px;
     bottom: 82px;
@@ -812,3 +830,4 @@ body.js-enabled .reveal-section.is-visible {
     transition-duration: .001ms !important;
   }
 }
+
