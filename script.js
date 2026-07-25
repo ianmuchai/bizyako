@@ -16,6 +16,14 @@ const demoForm = document.querySelector("[data-demo-form]");
 const demoProductName = document.querySelector("[data-demo-product-name]");
 const demoNeed = document.querySelector("[data-demo-need]");
 const demoMessage = document.querySelector("[data-demo-message]");
+const supportChatButton = document.querySelector("[data-support-chat]");
+const chatPanel = document.querySelector("[data-chat-panel]");
+const chatClose = document.querySelector("[data-chat-close]");
+const chatMessages = document.querySelector("[data-chat-messages]");
+const chatContact = document.querySelector("[data-chat-contact]");
+const leadBuilder = document.querySelector("[data-lead-builder]");
+const leadForm = document.querySelector("[data-lead-form]");
+const openLeadButtons = document.querySelectorAll("[data-open-lead-builder]");
 
 let products = {};
 let activeProductId = "law";
@@ -262,6 +270,184 @@ const closeDemoModal = () => {
   document.body.classList.remove("modal-open");
 };
 
+const productGuides = {
+  law: {
+    user: "I need a law firm CRM.",
+    title: "Law CRM is the right starting point.",
+    text: "BizYako can help you manage client intake, matters, deadlines, documents, billing, and partner visibility from one workspace.",
+    next: "A good next step is a CRM demo or a product brief for your firm workflow.",
+  },
+  erp: {
+    user: "I need an ERP.",
+    title: "ERP fits operations that need control across departments.",
+    text: "BizYako can structure procurement, HR, finance, inventory, approvals, reporting, and permissions into a phased ERP rollout.",
+    next: "Define the modules you need first so the build can launch in practical phases.",
+  },
+  pos: {
+    user: "I need a POS system.",
+    title: "POS is ideal for sales, stock, and branch visibility.",
+    text: "BizYako can connect checkout, payments, inventory movement, staff activity, loyalty, and management dashboards.",
+    next: "A demo can show the sales-to-reporting flow, then we can scope branches and inventory needs.",
+  },
+  analytics: {
+    user: "I need analytics.",
+    title: "Analytics helps leadership act faster.",
+    text: "BizYako can unify data into dashboards, alerts, trends, imports, and executive summaries across your existing systems.",
+    next: "Start by defining your data sources and the decisions each dashboard should support.",
+  },
+  isp: {
+    user: "I need ISP management.",
+    title: "ISP management keeps subscribers, billing, and field work aligned.",
+    text: "BizYako can support plans, tickets, reminders, network assets, service history, dispatch, and billing status.",
+    next: "Define your subscriber flow and current billing/support tools so the first release targets the biggest bottleneck.",
+  },
+  agents: {
+    user: "I need AI agents.",
+    title: "AI agents fit repetitive follow-ups and operations support.",
+    text: "BizYako can design controlled agents for lead response, reminders, ticket triage, reporting, and workflow assistance with human approvals.",
+    next: "A workflow map will show where agents save time without losing control.",
+  },
+  custom: {
+    user: "I want to define a custom product.",
+    title: "Let us shape your product brief.",
+    text: "Tell us the industry, product type, must-have modules, timeline, and business goal. BizYako will convert that into a clear consultation request.",
+    next: "Open the product definition form and describe the system you want to create.",
+  },
+};
+
+const appendChatMessage = (type, content) => {
+  if (!chatMessages) return;
+  const bubble = document.createElement("article");
+  bubble.className = `chat-bubble ${type}`;
+  if (typeof content === "string") {
+    bubble.innerHTML = `<span>${escapeHtml(content)}</span>`;
+  } else {
+    bubble.innerHTML = content;
+  }
+  chatMessages.appendChild(bubble);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+};
+
+const openChatPanel = () => {
+  if (!chatPanel) return;
+  chatPanel.classList.add("open");
+  chatPanel.setAttribute("aria-hidden", "false");
+  supportChatButton?.classList.add("active");
+};
+
+const closeChatPanel = () => {
+  if (!chatPanel) return;
+  chatPanel.classList.remove("open");
+  chatPanel.setAttribute("aria-hidden", "true");
+  supportChatButton?.classList.remove("active");
+};
+
+const openLeadBuilder = (productId = activeProductId) => {
+  if (!leadBuilder) return;
+  const select = leadBuilder.querySelector('select[name="product"]');
+  const productMap = {
+    law: "CRM",
+    erp: "ERP",
+    pos: "POS",
+    analytics: "Analytics dashboard",
+    isp: "ISP management",
+    agents: "AI agent workflow",
+  };
+  if (select && productMap[productId]) select.value = productMap[productId];
+  leadBuilder.classList.add("open");
+  leadBuilder.setAttribute("aria-hidden", "false");
+  document.body.classList.add("modal-open");
+  leadBuilder.querySelector("input")?.focus();
+};
+
+const closeLeadBuilder = () => {
+  if (!leadBuilder) return;
+  leadBuilder.classList.remove("open");
+  leadBuilder.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("modal-open");
+};
+
+const handleChatIntent = (intent) => {
+  const guide = productGuides[intent] || productGuides.custom;
+  appendChatMessage("user", guide.user);
+  window.setTimeout(() => {
+    appendChatMessage(
+      "bot",
+      `<strong>${escapeHtml(guide.title)}</strong><span>${escapeHtml(guide.text)}</span><span>${escapeHtml(guide.next)}</span><div class="chat-inline-actions"><button type="button" data-open-lead-builder>Define product</button><a href="#contact" data-chat-contact>Book consultation</a></div>`
+    );
+  }, 180);
+
+  if (intent !== "custom") activateProduct(intent, false);
+  if (intent === "custom") window.setTimeout(() => openLeadBuilder(activeProductId), 520);
+};
+
+supportChatButton?.addEventListener("click", () => {
+  if (chatPanel?.classList.contains("open")) closeChatPanel();
+  else openChatPanel();
+});
+chatClose?.addEventListener("click", closeChatPanel);
+chatPanel?.addEventListener("click", (event) => {
+  const quick = event.target.closest("[data-chat-intent]");
+  if (quick) handleChatIntent(quick.dataset.chatIntent);
+
+  const leadButton = event.target.closest("[data-open-lead-builder]");
+  if (leadButton) openLeadBuilder(activeProductId);
+
+  const contactLink = event.target.closest("[data-chat-contact]");
+  if (contactLink) closeChatPanel();
+});
+openLeadButtons.forEach((button) => button.addEventListener("click", () => openLeadBuilder(activeProductId)));
+document.querySelectorAll("[data-lead-close]").forEach((item) => item.addEventListener("click", closeLeadBuilder));
+
+leadForm?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const button = leadForm.querySelector("button");
+  const data = Object.fromEntries(new FormData(leadForm).entries());
+  const payload = {
+    name: data.name,
+    need: `Product definition: ${data.product}`,
+    message: [
+      `Product definition lead for ${data.company}.`,
+      `Contact: ${data.contact}.`,
+      `Industry: ${data.industry}.`,
+      `Product type: ${data.product}.`,
+      `Timeline: ${data.timeline}.`,
+      `Budget direction: ${data.budget}.`,
+      `Must-have modules: ${data.modules}.`,
+      `Goal: ${data.goal}.`,
+    ].join(" "),
+  };
+
+  button.textContent = "Sending product brief...";
+  button.disabled = true;
+
+  try {
+    const response = await fetch("/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const result = await response.json();
+    button.textContent = result.ok ? "Product brief sent" : "Check your details";
+    if (result.ok) {
+      appendChatMessage("bot", "Your product brief has been sent. BizYako will use it to prepare the right consultation path.");
+      setTimeout(() => {
+        leadForm.reset();
+        closeLeadBuilder();
+        button.textContent = "Send product brief";
+        button.disabled = false;
+      }, 1500);
+      return;
+    }
+  } catch (error) {
+    button.textContent = "Backend unavailable";
+  }
+
+  setTimeout(() => {
+    button.textContent = "Send product brief";
+    button.disabled = false;
+  }, 2200);
+});
 const industryTargets = {
   "Law firms": { href: "#products", product: "law" },
   "Retail and hospitality": { href: "#products", product: "pos" },
@@ -303,6 +489,7 @@ const loadSiteData = async () => {
     const site = await response.json();
 
     hydrateProducts(site.products);
+    hydrateHeroSlides(site.carouselSlides);
     renderIndustries(site.industries);
   } catch (error) {
     console.warn(error);
@@ -444,6 +631,11 @@ contactForm.addEventListener("submit", async (event) => {
   }, 2200);
 });
 
+renderHeroControls();
+setHeroSlide(0);
+startHeroCarousel();
 loadSiteData();
 syncBackendStatus();
 revealSections();
+
+

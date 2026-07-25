@@ -296,6 +296,128 @@
       <p>CRM | ERP | POS | Analytics | ISP Management | AI Automation</p>
     </footer>
 
+    <div class="support-hub" aria-label="BizYako support actions">
+      <a
+        class="support-action whatsapp-action"
+        href="https://wa.me/254700000000?text=Hello%20BizYako%2C%20I%20would%20like%20to%20discuss%20a%20business%20technology%20product."
+        target="_blank"
+        rel="noopener"
+        aria-label="Chat with BizYako on WhatsApp"
+        data-whatsapp-link
+      >
+        <span>WA</span>
+      </a>
+      <button class="support-action chat-action" type="button" aria-label="Open BizYako assistant" data-support-chat>
+        <span>Chat</span>
+      </button>
+    </div>
+
+    <section class="chat-panel" aria-label="BizYako assistant" aria-hidden="true" data-chat-panel>
+      <div class="chat-head">
+        <div>
+          <p class="eyebrow">BizYako Assistant</p>
+          <h2>Find the right system faster.</h2>
+        </div>
+        <button type="button" aria-label="Close BizYako assistant" data-chat-close>x</button>
+      </div>
+      <div class="chat-messages" data-chat-messages>
+        <article class="chat-bubble bot">
+          <strong>Hi, I am the BizYako guide.</strong>
+          <span>Choose what you want to improve and I will point you to the right product or help you define a custom build.</span>
+        </article>
+      </div>
+      <div class="chat-quick-actions" aria-label="Quick product choices">
+        <button type="button" data-chat-intent="law">Law CRM</button>
+        <button type="button" data-chat-intent="erp">ERP</button>
+        <button type="button" data-chat-intent="pos">POS</button>
+        <button type="button" data-chat-intent="analytics">Analytics</button>
+        <button type="button" data-chat-intent="isp">ISP</button>
+        <button type="button" data-chat-intent="agents">AI Agents</button>
+        <button type="button" data-chat-intent="custom">Define my product</button>
+      </div>
+      <div class="chat-footer-actions">
+        <button class="button primary" type="button" data-open-lead-builder>Define a product</button>
+        <a class="button secondary" href="#contact" data-chat-contact>Request consultation</a>
+      </div>
+    </section>
+
+    <div class="lead-builder" data-lead-builder aria-hidden="true">
+      <div class="lead-backdrop" data-lead-close></div>
+      <section class="lead-dialog" role="dialog" aria-modal="true" aria-labelledby="lead-title">
+        <button class="lead-close" type="button" aria-label="Close product definition" data-lead-close>x</button>
+        <p class="eyebrow">Product Definition</p>
+        <h2 id="lead-title">Describe the business system you want BizYako to build.</h2>
+        <p class="lead-intro">
+          Share the product direction, modules, and timeline. We will turn it into a focused consultation request.
+        </p>
+        <form class="lead-form" data-lead-form>
+          <div class="lead-form-grid">
+            <label>
+              Your name
+              <input type="text" name="name" placeholder="Your name" required />
+            </label>
+            <label>
+              Work email or phone
+              <input type="text" name="contact" placeholder="you@company.com or phone number" required />
+            </label>
+            <label>
+              Business / company
+              <input type="text" name="company" placeholder="Company or firm name" required />
+            </label>
+            <label>
+              Industry
+              <select name="industry" required>
+                <option>Legal services</option>
+                <option>Retail or hospitality</option>
+                <option>Manufacturing or distribution</option>
+                <option>ISP or utility operations</option>
+                <option>Professional services</option>
+                <option>Other business</option>
+              </select>
+            </label>
+            <label>
+              Product type
+              <select name="product" required>
+                <option>CRM</option>
+                <option>ERP</option>
+                <option>POS</option>
+                <option>Analytics dashboard</option>
+                <option>ISP management</option>
+                <option>AI agent workflow</option>
+                <option>Custom business platform</option>
+              </select>
+            </label>
+            <label>
+              Timeline
+              <select name="timeline" required>
+                <option>As soon as possible</option>
+                <option>Within 1 month</option>
+                <option>1 to 3 months</option>
+                <option>3+ months</option>
+              </select>
+            </label>
+            <label>
+              Budget direction
+              <select name="budget" required>
+                <option>Need guidance</option>
+                <option>Starter build</option>
+                <option>Growth build</option>
+                <option>Enterprise build</option>
+              </select>
+            </label>
+            <label>
+              Must-have modules
+              <input type="text" name="modules" placeholder="Dashboards, billing, inventory, documents, approvals..." required />
+            </label>
+          </div>
+          <label>
+            What should this product help you achieve?
+            <textarea name="goal" rows="4" placeholder="Describe the workflow, pain point, or product idea" required></textarea>
+          </label>
+          <button class="button primary" type="submit">Send product brief</button>
+        </form>
+      </section>
+    </div>
 
     <div class="demo-modal" data-demo-modal aria-hidden="true">
       <div class="demo-backdrop" data-demo-close></div>
@@ -329,3 +451,4 @@
     <script src="script.js"></script>
   </body>
 </html>
+
