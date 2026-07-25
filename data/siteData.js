@@ -10,7 +10,7 @@ const products = [
     title: "Law firm CRM that keeps every matter visible.",
     text: "Track clients, matters, deadlines, billing, document movement, task ownership, and follow-ups from one focused workspace.",
     points: ["Client intake and matter pipelines", "Deadline, task, and fee tracking", "Partner-level performance dashboards"],
-    demoUrl: "#contact",
+    demoUrl: "product-demo.html?product=law",
   },
   {
     id: "erp",
@@ -18,7 +18,7 @@ const products = [
     title: "ERP modules for finance, approvals, procurement, and teams.",
     text: "Bring departments into one operating system with clean permissions, audit trails, approval flows, and real-time reporting.",
     points: ["Procurement, inventory, HR, and finance modules", "Branch and department-level permissions", "Management reports with export-ready data"],
-    demoUrl: "#contact",
+    demoUrl: "product-demo.html?product=erp",
   },
   {
     id: "pos",
@@ -26,7 +26,7 @@ const products = [
     title: "POS tools built for speed, stock control, and branch clarity.",
     text: "Serve customers quickly while keeping inventory, payments, staff activity, and sales performance synchronized.",
     points: ["Fast checkout and payment tracking", "Inventory alerts and product movement", "Multi-branch sales summaries"],
-    demoUrl: "#contact",
+    demoUrl: "product-demo.html?product=pos",
   },
   {
     id: "analytics",
@@ -34,7 +34,7 @@ const products = [
     title: "Dashboards that turn business data into action.",
     text: "Unify operational data into practical reports, alerts, and AI-assisted analysis for leaders and department heads.",
     points: ["Executive and team dashboards", "Trend analysis and automated alerts", "Data cleanup, imports, and integrations"],
-    demoUrl: "#contact",
+    demoUrl: "product-demo.html?product=analytics",
   },
   {
     id: "isp",
@@ -42,7 +42,7 @@ const products = [
     title: "ISP management for subscribers, billing, support, and field work.",
     text: "Manage customer plans, service tickets, network assets, billing status, and installation workflows from a single view.",
     points: ["Subscriber onboarding and plan management", "Ticketing, dispatch, and service history", "Billing, reminders, and network asset visibility"],
-    demoUrl: "#contact",
+    demoUrl: "product-demo.html?product=isp",
   },
   {
     id: "agents",
@@ -50,7 +50,7 @@ const products = [
     title: "AI agents that handle repetitive business work around the clock.",
     text: "Deploy role-aware agents for intake, follow-ups, reporting, ticket triage, reminders, and operations support while your team stays in control.",
     points: ["Client and lead response agents", "Reporting and workflow assistants", "Human approval paths and audit trails"],
-    demoUrl: "#contact",
+    demoUrl: "product-demo.html?product=agents",
   },
 ];
 
@@ -61,6 +61,14 @@ const industries = [
   { title: "Growing SMEs", text: "ERP workflows for procurement, finance, HR, approvals, assets, and management reporting." },
 ];
 
+
+const contactDetails = {
+  address: "PO Box 2086 Karen",
+  email: "hello@bizyako.com",
+  social: {
+    x: "https://x.com/bizYako",
+  },
+};
 const metrics = {
   uptimeTarget: "99.9%",
   launchModel: "Phased MVP to scale",
@@ -116,6 +124,7 @@ function getSitePayload() {
     products,
     industries,
     metrics,
+    contactDetails,
     carouselSlides: getCarouselSlides(),
     posterSpecs,
   };
@@ -143,4 +152,7 @@ function normalizeLead(payload = {}) {
   };
 }
 
-module.exports = { products, industries, metrics, getSitePayload, normalizeLead, getCarouselSlides, saveCarouselSlides, posterSpecs };
+module.exports = { products, industries, metrics, contactDetails, getSitePayload, normalizeLead, getCarouselSlides, saveCarouselSlides, posterSpecs };
+
+
+
