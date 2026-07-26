@@ -1325,3 +1325,76 @@ a.footer-icon-card:focus-visible {
   .footer-column a { min-height: 34px; display: inline-flex; align-items: center; }
   .footer-icon-card { border-radius: 16px; }
 }
+
+/* Enhanced carousel admin image controls */
+.admin-guidance-panel {
+  display: grid;
+  grid-template-columns: minmax(280px,.8fr) minmax(0,1.2fr);
+  gap: 18px;
+  margin-bottom: 18px;
+  padding: clamp(18px,3vw,28px);
+  border: 1px solid rgba(157,233,209,0.18);
+  border-radius: 28px;
+  background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.04));
+  box-shadow: 0 24px 80px rgba(0,0,0,0.22);
+  backdrop-filter: blur(18px);
+}
+.admin-guidance-panel h2 { margin: 0; color: #fff; font-size: clamp(1.55rem,3vw,2.7rem); line-height: 1.05; }
+.admin-guidance-panel p:not(.eyebrow) { color: rgba(255,255,255,0.72); line-height: 1.65; }
+.admin-guidance-panel .admin-spec-grid { margin-bottom: 0; }
+.admin-guidance-panel .admin-spec-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.admin-slide-preview { display: grid; gap: 12px; align-content: start; }
+.admin-image-meta {
+  display: grid;
+  gap: 5px;
+  padding: 13px;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 16px;
+  background: rgba(0,0,0,0.18);
+}
+.admin-image-meta strong { color: #fff; }
+.admin-image-meta span { color: rgba(255,255,255,0.68); line-height: 1.45; }
+.admin-image-meta.good { border-color: rgba(8,184,147,0.46); background: rgba(8,184,147,0.12); }
+.admin-image-meta.warn { border-color: rgba(246,178,60,0.5); background: rgba(246,178,60,0.12); }
+.admin-slide-title-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: start;
+}
+.admin-slide-title-row .eyebrow { margin-bottom: 5px; }
+.admin-slide-title-row > span {
+  flex: 0 0 auto;
+  padding: 8px 10px;
+  border: 1px solid rgba(157,233,209,0.22);
+  border-radius: 999px;
+  color: var(--mint);
+  background: rgba(8,184,147,0.1);
+  font-size: .78rem;
+  font-weight: 900;
+}
+.admin-slide-fields label span,
+.admin-upload-field span { color: rgba(255,255,255,0.9); }
+.admin-slide-fields label small,
+.admin-upload-field small { color: rgba(255,255,255,0.58); line-height: 1.45; }
+.admin-upload-field {
+  padding: 15px;
+  border: 1px dashed rgba(157,233,209,0.34);
+  border-radius: 18px;
+  background: linear-gradient(145deg, rgba(8,184,147,0.14), rgba(39,167,223,0.06));
+}
+.admin-upload-field input[type="file"] {
+  padding: 12px;
+  color: rgba(255,255,255,0.82);
+  background: rgba(0,0,0,0.2);
+  cursor: pointer;
+}
+.admin-slide-preview img {
+  min-height: 240px;
+  box-shadow: 0 24px 70px rgba(0,0,0,0.24);
+}
+@media (max-width: 900px) {
+  .admin-guidance-panel,
+  .admin-guidance-panel .admin-spec-grid { grid-template-columns: 1fr; }
+  .admin-slide-title-row { display: grid; }
+}

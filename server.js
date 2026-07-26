@@ -13,6 +13,10 @@ const mimeTypes = {
   ".js": "application/javascript; charset=utf-8",
   ".json": "application/json; charset=utf-8",
   ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".webp": "image/webp",
+  ".avif": "image/avif",
   ".svg": "image/svg+xml; charset=utf-8",
   ".ico": "image/x-icon",
 };
@@ -30,7 +34,7 @@ function collectBody(req) {
     let body = "";
     req.on("data", (chunk) => {
       body += chunk;
-      if (body.length > 1_000_000) {
+      if (body.length > 8_000_000) {
         req.destroy();
         reject(new Error("Request body too large"));
       }
@@ -129,3 +133,5 @@ const server = http.createServer(async (req, res) => {
 server.listen(PORT, () => {
   console.log(`BizYako frontend and backend running at http://localhost:${PORT}`);
 });
+
+

@@ -12,20 +12,28 @@
         <div>
           <p class="eyebrow">Incognito Admin</p>
           <h1>Carousel poster manager</h1>
-          <p>Manage the 5 hero carousel posters. This page is hidden from site navigation.</p>
+          <p>Manage the 5 hero carousel posters, replace images, and confirm the correct poster dimensions before publishing.</p>
         </div>
         <a class="button secondary" href="/">Back to site</a>
       </section>
 
-      <section class="admin-spec-grid" data-poster-specs></section>
+      <section class="admin-guidance-panel" aria-label="Carousel poster design guidance">
+        <div>
+          <p class="eyebrow">Poster Requirements</p>
+          <h2>Design every carousel poster at 1920 x 1080 px.</h2>
+          <p>Use a 16:9 landscape canvas. Keep important text, faces, and product visuals inside the center safe area so the hero crop works on mobile and desktop.</p>
+        </div>
+        <section class="admin-spec-grid" data-poster-specs></section>
+      </section>
 
       <section class="admin-editor-grid" data-slide-editor></section>
 
       <div class="admin-save-bar">
-        <p data-admin-status>Changes save to the local BizYako project. Push to GitHub/Vercel to publish.</p>
+        <p data-admin-status>Use the local admin to save poster image changes. The live Vercel admin is read-only and cannot write files back to GitHub.</p>
         <button class="button primary" type="button" data-save-carousel>Save carousel posters</button>
       </div>
     </main>
     <script src="admin.js"></script>
   </body>
 </html>
+
