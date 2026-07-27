@@ -3,6 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#08b893" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" href="/assets/icons/bizyako-192.png" />
+    <link rel="apple-touch-icon" href="/assets/icons/bizyako-192.png" />
     <title>BizYako Product Demo</title>
     <meta name="description" content="Preview BizYako CRM, ERP, POS, analytics, ISP management, AI agent, mobile app, PWA, and website product demos." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -149,7 +153,15 @@
       </div>
     </footer>
 
-    <script src="product-demo.js"></script>
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("/service-worker.js").catch((error) => {
+            console.warn("Service worker registration failed", error);
+          });
+        });
+      }
+    </script>    <script src="product-demo.js"></script>
   </body>
 </html>
 

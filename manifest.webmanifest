@@ -1,0 +1,25 @@
+{
+  "name": "BizYako",
+  "short_name": "BizYako",
+  "description": "Business technology products built for growth.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#06131b",
+  "theme_color": "#08b893",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/assets/icons/bizyako-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/icons/bizyako-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
