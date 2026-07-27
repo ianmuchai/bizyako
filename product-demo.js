@@ -59,9 +59,39 @@ const productCatalog = {
     workflows: ["Receive task or inquiry", "Draft the next action or report", "Escalate for human review before final action"],
     score: "89%",
   },
+  mobile: {
+    label: "Mobile Apps",
+    kicker: "Mobile product engineering",
+    title: "Mobile apps product demo",
+    text: "Preview secure iOS and Android workflows for customer service, field operations, payments, approvals, notifications, and connected business data.",
+    points: ["Role-aware mobile workflows", "Offline sync and push notifications", "Payments and device integrations"],
+    stats: ["iOS + Android", "Offline-ready", "Secure access"],
+    workflows: ["Open the right role workspace", "Complete work online or offline", "Synchronize actions with the business platform"],
+    score: "95%",
+  },
+  pwa: {
+    label: "PWAs",
+    kicker: "Installable web applications",
+    title: "Progressive Web App demo",
+    text: "Preview an installable, responsive application with fast navigation, resilient loading, offline workflows, and automatic updates.",
+    points: ["Installable app-like experience", "Offline-ready workflows", "Automatic browser-delivered updates"],
+    stats: ["Installable", "Resilient", "Always current"],
+    workflows: ["Open or install from the browser", "Continue essential work through weak connectivity", "Receive the latest version automatically"],
+    score: "94%",
+  },
+  websites: {
+    label: "Websites",
+    kicker: "Digital presence and commerce",
+    title: "Business website demo",
+    text: "Preview a high-performance business website, ecommerce journey, or customer portal designed for discovery, conversion, and manageable growth.",
+    points: ["Responsive high-performance interface", "SEO and conversion journeys", "Content, commerce, and portal integrations"],
+    stats: ["Fast pages", "SEO-ready", "Conversion-led"],
+    workflows: ["Guide visitors to the right offer", "Capture or complete the desired action", "Measure results and improve content"],
+    score: "96%",
+  },
 };
 
-const productOrder = ["law", "erp", "pos", "analytics", "isp", "agents"];
+const productOrder = ["law", "erp", "pos", "analytics", "isp", "agents", "mobile", "pwa", "websites"];
 
 const escapeHtml = (value) =>
   String(value).replace(/[&<>"']/g, (character) => {

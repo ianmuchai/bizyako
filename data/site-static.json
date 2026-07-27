@@ -73,6 +73,42 @@
         "Human approval paths and audit trails"
       ],
       "demoUrl": "product-demo.html?product=agents"
+    },
+    {
+      "id": "mobile",
+      "kicker": "Mobile product engineering",
+      "title": "Mobile apps that keep customers and teams connected anywhere.",
+      "text": "Build secure iOS and Android experiences for customer service, field operations, payments, approvals, and real-time business workflows.",
+      "points": [
+        "Role-aware iOS and Android workflows",
+        "Offline synchronization and push notifications",
+        "Payments, device features, and system integrations"
+      ],
+      "demoUrl": "product-demo.html?product=mobile"
+    },
+    {
+      "id": "pwa",
+      "kicker": "Installable web applications",
+      "title": "Progressive Web Apps with browser reach and an app-like experience.",
+      "text": "Give users a fast, responsive product they can install directly from the browser, use reliably, and receive updates without an app-store release.",
+      "points": [
+        "Installable responsive application experiences",
+        "Offline-ready workflows and resilient loading",
+        "Automatic updates across supported devices"
+      ],
+      "demoUrl": "product-demo.html?product=pwa"
+    },
+    {
+      "id": "websites",
+      "kicker": "Digital presence and commerce",
+      "title": "Websites designed to convert attention into measurable growth.",
+      "text": "Launch high-performance business websites, ecommerce experiences, and customer portals with strong discovery, analytics, and manageable content.",
+      "points": [
+        "High-performance responsive interfaces",
+        "SEO, analytics, and conversion journeys",
+        "Content, ecommerce, and portal integrations"
+      ],
+      "demoUrl": "product-demo.html?product=websites"
     }
   ],
   "industries": [
@@ -109,6 +145,9 @@
       "Analytics",
       "ISP Ops",
       "AI Agents",
+      "Mobile Apps",
+      "Progressive Web Apps",
+      "Websites",
       "AI Automation"
     ]
   },

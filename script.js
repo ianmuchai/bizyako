@@ -232,12 +232,39 @@ const fallbackProducts = [
     points: ["Client and lead response agents", "Reporting and workflow assistants", "Human approval paths and audit trails"],
     demoUrl: "product-demo.html?product=agents",
   },
+  {
+    id: "mobile",
+    kicker: "Mobile product engineering",
+    title: "Mobile apps that keep customers and teams connected anywhere.",
+    text: "Build secure iOS and Android experiences for customer service, field operations, payments, approvals, and real-time business workflows.",
+    points: ["Role-aware iOS and Android workflows", "Offline synchronization and push notifications", "Payments, device features, and system integrations"],
+    demoUrl: "product-demo.html?product=mobile",
+  },
+  {
+    id: "pwa",
+    kicker: "Installable web applications",
+    title: "Progressive Web Apps with browser reach and an app-like experience.",
+    text: "Give users a fast, responsive product they can install directly from the browser, use reliably, and receive updates without an app-store release.",
+    points: ["Installable responsive application experiences", "Offline-ready workflows and resilient loading", "Automatic updates across supported devices"],
+    demoUrl: "product-demo.html?product=pwa",
+  },
+  {
+    id: "websites",
+    kicker: "Digital presence and commerce",
+    title: "Websites designed to convert attention into measurable growth.",
+    text: "Launch high-performance business websites, ecommerce experiences, and customer portals with strong discovery, analytics, and manageable content.",
+    points: ["High-performance responsive interfaces", "SEO, analytics, and conversion journeys", "Content, ecommerce, and portal integrations"],
+    demoUrl: "product-demo.html?product=websites",
+  },
 ];
 
 const productLabel = (product) => {
   if (!product) return "BizYako";
   if (product.id === "agents") return "AI agents";
   if (product.id === "law") return "CRM";
+  if (product.id === "mobile") return "Mobile Apps";
+  if (product.id === "pwa") return "PWA";
+  if (product.id === "websites") return "Websites";
   return product.id.toUpperCase();
 };
 
@@ -335,6 +362,24 @@ const productGuides = {
     text: "BizYako can design controlled agents for lead response, reminders, ticket triage, reporting, and workflow assistance with human approvals.",
     next: "A workflow map will show where agents save time without losing control.",
   },
+  mobile: {
+    user: "I need a mobile app.",
+    title: "Mobile apps connect customers and teams wherever work happens.",
+    text: "BizYako can build secure iOS and Android workflows with offline sync, notifications, payments, device features, and business-system integrations.",
+    next: "Define the users, devices, and key mobile actions so we can shape the right release path.",
+  },
+  pwa: {
+    user: "I need a Progressive Web App.",
+    title: "A PWA delivers app-like speed without app-store friction.",
+    text: "BizYako can build an installable responsive product with resilient loading, offline workflows, and automatic browser-delivered updates.",
+    next: "Map the essential online and offline journeys to define the first installable release.",
+  },
+  websites: {
+    user: "I need a website.",
+    title: "A focused website can turn attention into measurable growth.",
+    text: "BizYako can create a high-performance business site, ecommerce journey, or customer portal with SEO, analytics, and manageable content.",
+    next: "Define the audience, primary offer, and conversion goal so the experience has a clear commercial purpose.",
+  },
   custom: {
     user: "I want to define a custom product.",
     title: "Let us shape your product brief.",
@@ -380,6 +425,9 @@ const openLeadBuilder = (productId = activeProductId) => {
     analytics: "Analytics dashboard",
     isp: "ISP management",
     agents: "AI agent workflow",
+    mobile: "Mobile Apps",
+    pwa: "Progressive Web Apps",
+    websites: "Websites",
   };
   if (select && productMap[productId]) select.value = productMap[productId];
   leadBuilder.classList.add("open");
