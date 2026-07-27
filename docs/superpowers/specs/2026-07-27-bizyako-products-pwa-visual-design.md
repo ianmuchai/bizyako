@@ -2,7 +2,7 @@
 
 ## Objective
 
-Expand BizYako with three independent digital product offerings, make the public website installable as a Progressive Web App, and refine the existing visual system so the hero imagery is clearer, colors are more vibrant, and large typography feels controlled and professional.
+Expand BizYako with three independent digital product offerings, make the public website installable as a Progressive Web App, and refine the existing visual system so the hero imagery is clearer, colors are more vibrant, large typography feels controlled and professional, and the page uses wide screens without feeling crowded.
 
 The existing hero carousel images remain unchanged. The work changes their presentation, not the image files or carousel administration workflow.
 
@@ -190,6 +190,69 @@ Bold display text uses a maximum weight of 800, balanced line lengths, zero lett
 - The install control integrates into both desktop and mobile navigation without overlap.
 - Fixed dimensions and minimum heights prevent product labels, active states, and dynamic carousel copy from shifting the layout.
 
+## Full-Width Layout and Navigation
+
+The header and section backgrounds extend across the available viewport instead of appearing as narrow floating islands.
+
+The fixed header uses the full viewport width with a small, consistent outer gutter. Its inner layout distributes the brand, primary navigation, install control, and consultation action across the available space. Navigation links receive consistent horizontal spacing and stable hit areas without being enclosed in a crowded capsule.
+
+Public page sections use full-width visual bands with a shared wide inner content shell. The content shell targets approximately 1440 pixels on large screens and uses responsive side gutters. Long-form text keeps narrower readable measures inside that shell.
+
+The wider layout must not stretch compact UI elements. Product cards, controls, chat panels, and forms retain explicit maximum widths and stable dimensions.
+
+Crowding is reduced by:
+
+- Removing unnecessary nested glass containers
+- Using one clear surface per content group
+- Increasing spacing between unrelated controls
+- Keeping product tabs in one horizontally scrollable row
+- Reducing decorative borders and repeated gradients
+- Preserving larger blank areas around headings and calls to action
+- Limiting the number of simultaneously emphasized elements
+
+## Floating Support Controls
+
+### WhatsApp
+
+The WhatsApp action remains a direct external link. It does not open an intermediate website dialogue.
+
+Its floating control has:
+
+- No visible border
+- No inset frame or decorative boundary
+- No square outer container
+- A recognizable WhatsApp glyph on a clean circular brand surface
+- A soft shadow and small hover lift to separate it from the page
+- A minimum 48 by 48 pixel accessible target
+
+### Chat Trigger
+
+The chatbot trigger visually pairs with the WhatsApp control while remaining distinct.
+
+- No visible border or inset boundary
+- Circular brand surface with a soft shadow
+- A dialogue glyph containing three independently animated dots
+- The dots animate in a coordinated sequential rise-and-fade loop
+- Reduced-motion users see static dots
+- Animation pauses or settles when the chat panel is open
+
+### Chat Panel
+
+The chatbot panel floats above the bottom edge of the viewport and remains visually detached from the page content.
+
+- Desktop position: bottom-right with a consistent viewport gutter and enough clearance for the support controls
+- Mobile position: centered horizontally near the bottom with safe screen-edge gutters
+- No heavy perimeter border
+- Soft layered shadow and restrained translucent surface
+- Compact header and close control
+- Body typography between `0.82rem` and `0.88rem`
+- Compact quick-action labels with at least 44 pixel touch targets
+- Internal scrolling when message content exceeds the available height
+- Maximum height that keeps the page and close control visible
+- Opening and closing use a short rise-and-fade motion; reduced-motion users receive an immediate state change
+
+The panel must not cover the mobile navigation, primary hero actions, or both support controls at the same time.
+
 ## Accessibility and Motion
 
 - Every product control remains keyboard accessible.
@@ -230,8 +293,13 @@ Browser verification will cover:
 - Desktop and mobile hero composition
 - Clearer carousel imagery and reduced overlay darkness
 - Professional heading sizes and non-overlapping text
+- Full-width header and section bands with comfortable content gutters
+- Evenly spaced navigation and single-row product tabs
 - All nine product controls and demo links
 - Install control visibility and styling when the install event is available
+- Borderless WhatsApp and chatbot controls
+- Coordinated three-dot chatbot animation
+- Bottom-anchored floating chat panel with compact typography
 - Responsive navigation, product tabs, and product matrix
 - Offline loading of the public homepage after an initial successful visit
 - Continued online-only behavior for the private admin page
