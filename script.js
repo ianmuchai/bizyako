@@ -24,12 +24,14 @@ const chatContact = document.querySelector("[data-chat-contact]");
 const leadBuilder = document.querySelector("[data-lead-builder]");
 const leadForm = document.querySelector("[data-lead-form]");
 const openLeadButtons = document.querySelectorAll("[data-open-lead-builder]");
+const installAppButton = document.querySelector("[data-install-app]");
 
 let products = {};
 let activeProductId = "law";
 let activeHeroIndex = 0;
 let pendingDemoUrl = "product-demo.html?product=law";
 let heroTimer;
+let installPrompt = null;
 
 const heroArt = document.querySelector("[data-hero-art]");
 const heroKicker = document.querySelector("[data-hero-kicker]");
@@ -39,6 +41,25 @@ const heroPrimary = document.querySelector("[data-hero-primary]");
 const heroSecondary = document.querySelector("[data-hero-secondary]");
 const heroControls = document.querySelector("[data-hero-controls]");
 let heroSlideButtons = document.querySelectorAll("[data-hero-slide]");
+
+window.addEventListener("beforeinstallprompt", (event) => {
+  event.preventDefault();
+  installPrompt = event;
+  installAppButton?.classList.add("available");
+});
+
+installAppButton?.addEventListener("click", async () => {
+  if (!installPrompt) return;
+  installPrompt.prompt();
+  await installPrompt.userChoice;
+  installPrompt = null;
+  installAppButton.classList.remove("available");
+});
+
+window.addEventListener("appinstalled", () => {
+  installPrompt = null;
+  installAppButton?.classList.remove("available");
+});
 
 let heroSlides = [
   {
