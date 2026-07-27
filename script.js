@@ -335,6 +335,7 @@ const openDemoModal = () => {
 
   demoModal.classList.add("open");
   demoModal.setAttribute("aria-hidden", "false");
+  demoModal.removeAttribute("inert");
   document.body.classList.add("modal-open");
   demoModal.querySelector("input")?.focus();
 };
@@ -343,6 +344,7 @@ const closeDemoModal = () => {
   if (!demoModal) return;
   demoModal.classList.remove("open");
   demoModal.setAttribute("aria-hidden", "true");
+  demoModal.setAttribute("inert", "");
   document.body.classList.remove("modal-open");
 };
 
@@ -426,14 +428,18 @@ const openChatPanel = () => {
   if (!chatPanel) return;
   chatPanel.classList.add("open");
   chatPanel.setAttribute("aria-hidden", "false");
+  chatPanel.removeAttribute("inert");
   supportChatButton?.classList.add("active");
+  supportChatButton?.setAttribute("aria-expanded", "true");
 };
 
 const closeChatPanel = () => {
   if (!chatPanel) return;
   chatPanel.classList.remove("open");
   chatPanel.setAttribute("aria-hidden", "true");
+  chatPanel.setAttribute("inert", "");
   supportChatButton?.classList.remove("active");
+  supportChatButton?.setAttribute("aria-expanded", "false");
 };
 
 const openLeadBuilder = (productId = activeProductId) => {
@@ -453,6 +459,7 @@ const openLeadBuilder = (productId = activeProductId) => {
   if (select && productMap[productId]) select.value = productMap[productId];
   leadBuilder.classList.add("open");
   leadBuilder.setAttribute("aria-hidden", "false");
+  leadBuilder.removeAttribute("inert");
   document.body.classList.add("modal-open");
   leadBuilder.querySelector("input")?.focus();
 };
@@ -461,6 +468,7 @@ const closeLeadBuilder = () => {
   if (!leadBuilder) return;
   leadBuilder.classList.remove("open");
   leadBuilder.setAttribute("aria-hidden", "true");
+  leadBuilder.setAttribute("inert", "");
   document.body.classList.remove("modal-open");
 };
 

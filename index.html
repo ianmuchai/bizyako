@@ -18,7 +18,7 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css?v=20260727-1" />
   </head>
   <body>
     <header class="site-header" data-header>
@@ -63,12 +63,12 @@
               <a class="button primary magnetic" href="#products" data-hero-primary>Explore products</a>
               <a class="button secondary" href="#contact" data-hero-secondary>Book a demo</a>
             </div>
-            <div class="hero-carousel-controls" aria-label="Hero carousel controls" data-hero-controls>
+            <div class="hero-carousel-controls" role="group" aria-label="Hero carousel controls" data-hero-controls>
               <button class="active" type="button" data-hero-slide="0"><span>01</span>Suite</button>
               <button type="button" data-hero-slide="1"><span>02</span>Automation</button>
               <button type="button" data-hero-slide="2"><span>03</span>Intelligence</button>
             </div>
-            <div class="signal-row enhanced-signals" aria-label="BizYako highlights">
+            <div class="signal-row enhanced-signals" role="group" aria-label="BizYako highlights">
               <button type="button" data-console-product="law">Law CRM</button>
               <button type="button" data-console-product="erp">ERP</button>
               <button type="button" data-console-product="pos">POS</button>
@@ -86,7 +86,7 @@
               <span>Operating stack</span>
               <strong>Live modules</strong>
             </div>
-            <div class="console-orbit" aria-label="Jump to product systems">
+            <div class="console-orbit" role="group" aria-label="Jump to product systems">
               <button type="button" class="orbit-node active" data-console-product="law"><span>CRM</span><small>Legal</small></button>
               <button type="button" class="orbit-node" data-console-product="erp"><span>ERP</span><small>Ops</small></button>
               <button type="button" class="orbit-node" data-console-product="pos"><span>POS</span><small>Retail</small></button>
@@ -279,7 +279,7 @@
             Tell us what your team runs on today. We will help you identify the product modules,
             integrations, dashboards, and automations that make the strongest first release.
           </p>
-          <div class="contact-quick-details" aria-label="BizYako direct contact details">
+          <div class="contact-quick-details" role="group" aria-label="BizYako direct contact details">
             <a href="mailto:hello@bizyako.com">hello@bizyako.com</a>
             <span>PO Box 2086 Karen</span>
             <a href="https://x.com/bizYako" target="_blank" rel="noopener">Follow @bizYako</a>
@@ -341,7 +341,7 @@
           <a href="#process">Build process</a>
           <a href="#contact">Contact</a>
         </nav>
-        <div class="footer-contact-panel" aria-label="BizYako contact details">
+        <div class="footer-contact-panel" role="group" aria-label="BizYako contact details">
           <h2>Contact</h2>
           <a class="footer-icon-card" href="mailto:hello@bizyako.com">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5h16v11H4z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m4.7 7.2 7.3 5.4 7.3-5.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -362,13 +362,13 @@
         </div>
       </div>
       <div class="footer-bottom">
-        <p>� 2026 BizYako. All rights reserved.</p>
+        <p>&copy; 2026 BizYako. All rights reserved.</p>
         <p>bizyako.com</p>
         <p>CRM | ERP | POS | Analytics | ISP | AI Agents | Mobile Apps | PWAs | Websites</p>
       </div>
     </footer>
 
-    <div class="support-hub" aria-label="BizYako support actions">
+    <div class="support-hub" role="group" aria-label="BizYako support actions">
       <a
         class="support-action whatsapp-action"
         href="https://wa.me/254700000000?text=Hello%20BizYako%2C%20I%20would%20like%20to%20discuss%20a%20business%20technology%20product."
@@ -382,15 +382,17 @@
           <path d="M11.6 10.4c-.3-.7-.6-.7-.9-.7h-.8c-.3 0-.8.1-1.2.6-.4.5-1.6 1.5-1.6 3.7s1.6 4.3 1.8 4.6c.2.3 3.1 5 7.7 6.8 3.8 1.5 4.6 1.2 5.4 1.1.8-.1 2.6-1.1 3-2.1.4-1 .4-1.9.3-2.1-.1-.2-.4-.3-.9-.6l-2.8-1.4c-.4-.2-.8-.2-1.1.2l-1.3 1.6c-.2.3-.6.3-1 .1-.5-.2-2-.7-3.8-2.3-1.4-1.2-2.3-2.8-2.6-3.2-.3-.5 0-.7.2-1 .2-.2.5-.6.7-.8.2-.3.3-.5.5-.8.2-.3.1-.6 0-.9l-1.2-2.5Z" fill="currentColor" />
         </svg>
       </a>
-      <button class="support-action chat-action" type="button" aria-label="Open BizYako assistant" data-support-chat>
+      <button class="support-action chat-action" type="button" aria-label="Open BizYako assistant" aria-expanded="false" data-support-chat>
         <svg viewBox="0 0 32 32" aria-hidden="true" focusable="false">
           <path d="M6 7.8A4.8 4.8 0 0 1 10.8 3h10.4A4.8 4.8 0 0 1 26 7.8v8.7a4.8 4.8 0 0 1-4.8 4.8h-5.6L9.2 27v-5.7A4.8 4.8 0 0 1 6 16.5V7.8Z" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linejoin="round" />
-          <path d="M11.4 10.8h9.2M11.4 15.2h6.4" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" />
+          <circle class="chat-dot" cx="11.5" cy="13.4" r="1.45" fill="currentColor" />
+          <circle class="chat-dot" cx="16" cy="13.4" r="1.45" fill="currentColor" />
+          <circle class="chat-dot" cx="20.5" cy="13.4" r="1.45" fill="currentColor" />
         </svg>
       </button>
     </div>
 
-    <section class="chat-panel" aria-label="BizYako assistant" aria-hidden="true" data-chat-panel>
+    <section class="chat-panel" aria-label="BizYako assistant" aria-hidden="true" data-chat-panel inert>
       <div class="chat-head">
         <div>
           <p class="eyebrow">BizYako Assistant</p>
@@ -422,7 +424,7 @@
       </div>
     </section>
 
-    <div class="lead-builder" data-lead-builder aria-hidden="true">
+    <div class="lead-builder" data-lead-builder aria-hidden="true" inert>
       <div class="lead-backdrop" data-lead-close></div>
       <section class="lead-dialog" role="dialog" aria-modal="true" aria-labelledby="lead-title">
         <button class="lead-close" type="button" aria-label="Close product definition" data-lead-close>x</button>
@@ -503,7 +505,7 @@
       </section>
     </div>
 
-    <div class="demo-modal" data-demo-modal aria-hidden="true">
+    <div class="demo-modal" data-demo-modal aria-hidden="true" inert>
       <div class="demo-backdrop" data-demo-close></div>
       <section class="demo-dialog" role="dialog" aria-modal="true" aria-labelledby="demo-title">
         <button class="demo-close" type="button" aria-label="Close demo signup" data-demo-close>x</button>
@@ -539,7 +541,7 @@
           });
         });
       }
-    </script>    <script src="script.js"></script>
+    </script>    <script src="script.js?v=20260727-1"></script>
   </body>
 </html>
 

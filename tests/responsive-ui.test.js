@@ -1,0 +1,18 @@
+const test = require("node:test");
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
+
+const styles = fs.readFileSync(path.join(__dirname, "..", "styles.css"), "utf8");
+
+test("hero grid children can shrink within a mobile viewport", () => {
+  assert.match(styles, /\.hero-mainline,\s*\.hero-console\s*\{[^}]*min-width:\s*0/s);
+  assert.match(styles, /@media \(max-width:\s*620px\)[\s\S]*?\.upgraded-hero\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)/s);
+});
+
+test("dense hero controls scroll instead of widening the page", () => {
+  assert.match(
+    styles,
+    /\.hero-carousel-controls\s*\{[^}]*display:\s*flex[^}]*flex-wrap:\s*nowrap[^}]*max-width:\s*100%[^}]*overflow-x:\s*auto/s
+  );
+});
