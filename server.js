@@ -45,7 +45,14 @@ function collectBody(req) {
 }
 
 function serveFile(res, pathname) {
-  const cleanPath = pathname === "/" ? "/index.html" : pathname;
+  const routeFiles = {
+    "/": "/index.html",
+    "/product-demo": "/product-demo.html",
+    "/product-demo/": "/product-demo.html",
+    "/by-admin": "/by-admin.html",
+    "/by-admin/": "/by-admin.html",
+  };
+  const cleanPath = routeFiles[pathname] || pathname;
   const filePath = path.normalize(path.join(PUBLIC_ROOT, cleanPath));
 
   if (!filePath.startsWith(PUBLIC_ROOT)) {
