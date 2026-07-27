@@ -1,0 +1,200 @@
+{
+  "brand": "bizYako",
+  "tagline": "Your Business, Powered by AI.",
+  "products": [
+    {
+      "id": "law",
+      "kicker": "Legal operations",
+      "title": "Law firm CRM that keeps every matter visible.",
+      "text": "Track clients, matters, deadlines, billing, document movement, task ownership, and follow-ups from one focused workspace.",
+      "points": [
+        "Client intake and matter pipelines",
+        "Deadline, task, and fee tracking",
+        "Partner-level performance dashboards"
+      ],
+      "demoUrl": "product-demo.html?product=law"
+    },
+    {
+      "id": "erp",
+      "kicker": "Enterprise workflows",
+      "title": "ERP modules for finance, approvals, procurement, and teams.",
+      "text": "Bring departments into one operating system with clean permissions, audit trails, approval flows, and real-time reporting.",
+      "points": [
+        "Procurement, inventory, HR, and finance modules",
+        "Branch and department-level permissions",
+        "Management reports with export-ready data"
+      ],
+      "demoUrl": "product-demo.html?product=erp"
+    },
+    {
+      "id": "pos",
+      "kicker": "Retail systems",
+      "title": "POS tools built for speed, stock control, and branch clarity.",
+      "text": "Serve customers quickly while keeping inventory, payments, staff activity, and sales performance synchronized.",
+      "points": [
+        "Fast checkout and payment tracking",
+        "Inventory alerts and product movement",
+        "Multi-branch sales summaries"
+      ],
+      "demoUrl": "product-demo.html?product=pos"
+    },
+    {
+      "id": "analytics",
+      "kicker": "Decision intelligence",
+      "title": "Dashboards that turn business data into action.",
+      "text": "Unify operational data into practical reports, alerts, and AI-assisted analysis for leaders and department heads.",
+      "points": [
+        "Executive and team dashboards",
+        "Trend analysis and automated alerts",
+        "Data cleanup, imports, and integrations"
+      ],
+      "demoUrl": "product-demo.html?product=analytics"
+    },
+    {
+      "id": "isp",
+      "kicker": "Network operations",
+      "title": "ISP management for subscribers, billing, support, and field work.",
+      "text": "Manage customer plans, service tickets, network assets, billing status, and installation workflows from a single view.",
+      "points": [
+        "Subscriber onboarding and plan management",
+        "Ticketing, dispatch, and service history",
+        "Billing, reminders, and network asset visibility"
+      ],
+      "demoUrl": "product-demo.html?product=isp"
+    },
+    {
+      "id": "agents",
+      "kicker": "AI workforce",
+      "title": "AI agents that handle repetitive business work around the clock.",
+      "text": "Deploy role-aware agents for intake, follow-ups, reporting, ticket triage, reminders, and operations support while your team stays in control.",
+      "points": [
+        "Client and lead response agents",
+        "Reporting and workflow assistants",
+        "Human approval paths and audit trails"
+      ],
+      "demoUrl": "product-demo.html?product=agents"
+    }
+  ],
+  "industries": [
+    {
+      "title": "Law firms",
+      "text": "Client intake, case lifecycle, billing, documents, reminders, and partner visibility."
+    },
+    {
+      "title": "Retail and hospitality",
+      "text": "Fast checkout, inventory control, branch reporting, staff roles, and customer loyalty tools."
+    },
+    {
+      "title": "ISPs and utilities",
+      "text": "Subscriber onboarding, service plans, tickets, billing, network assets, and field team dispatch."
+    },
+    {
+      "title": "Growing SMEs",
+      "text": "ERP workflows for procurement, finance, HR, approvals, assets, and management reporting."
+    }
+  ],
+  "metrics": {
+    "uptimeTarget": "99.9%",
+    "launchModel": "Phased MVP to scale",
+    "brandPalette": [
+      "#08b893",
+      "#06131b",
+      "#9de9d1",
+      "#ffffff"
+    ],
+    "services": [
+      "CRM",
+      "ERP",
+      "POS",
+      "Analytics",
+      "ISP Ops",
+      "AI Agents",
+      "AI Automation"
+    ]
+  },
+  "contactDetails": {
+    "address": "PO Box 2086 Karen",
+    "email": "hello@bizyako.com",
+    "social": {
+      "x": "https://x.com/bizYako"
+    }
+  },
+  "carouselSlides": [
+    {
+      "id": "suite",
+      "label": "Suite",
+      "image": "assets/bizyako-hero-vibrant.png",
+      "kicker": "Your Business, Powered by AI.",
+      "status": "Unified suite live",
+      "title": "Business software that feels built for you.",
+      "copy": "Modern CRM, ERP, POS, analytics, ISP management, and AI agent tools designed around real business workflows.",
+      "primary": "Explore products",
+      "secondary": "Book a demo",
+      "primaryHref": "#products",
+      "secondaryHref": "#contact"
+    },
+    {
+      "id": "automation",
+      "label": "Automation",
+      "image": "assets/bizyako-hero.png",
+      "kicker": "Automation without the chaos",
+      "status": "AI workflows ready",
+      "title": "Turn repetitive operations into guided, intelligent workflows.",
+      "copy": "BizYako connects intake, approvals, reminders, reports, tickets, billing, and customer follow-up so teams spend less time chasing work.",
+      "primary": "See AI agents",
+      "secondary": "Map my workflow",
+      "primaryHref": "#products",
+      "secondaryHref": "#process",
+      "product": "agents"
+    },
+    {
+      "id": "intelligence",
+      "label": "Intelligence",
+      "image": "assets/bizyako-hero-vibrant.png",
+      "kicker": "Data that managers can act on",
+      "status": "Decision layer online",
+      "title": "From POS to ERP to analytics, your business finally speaks one language.",
+      "copy": "Give every product a clean data layer with dashboards, alerts, role views, and executive summaries for faster decisions.",
+      "primary": "View analytics",
+      "secondary": "Start a sprint",
+      "primaryHref": "#products",
+      "secondaryHref": "#contact",
+      "product": "analytics"
+    },
+    {
+      "id": "operations",
+      "label": "Operations",
+      "image": "assets/bizyako-hero.png",
+      "kicker": "Operations connected end to end",
+      "status": "ERP layer active",
+      "title": "Run approvals, stock, finance, teams, and reports from one connected workspace.",
+      "copy": "Launch the modules you need first, then expand into procurement, HR, inventory, accounting, customer records, and management intelligence.",
+      "primary": "Explore ERP",
+      "secondary": "Talk to us",
+      "primaryHref": "#products",
+      "secondaryHref": "#contact",
+      "product": "erp"
+    },
+    {
+      "id": "retail",
+      "label": "Retail",
+      "image": "assets/bizyako-hero-vibrant.png",
+      "kicker": "Sales, stock, and branches in sync",
+      "status": "POS stack ready",
+      "title": "Give front-office teams speed while management gets real visibility.",
+      "copy": "BizYako POS connects checkout, inventory, staff actions, payments, branch reporting, loyalty, and analytics in one practical flow.",
+      "primary": "See POS",
+      "secondary": "Book a demo",
+      "primaryHref": "#products",
+      "secondaryHref": "#contact",
+      "product": "pos"
+    }
+  ],
+  "posterSpecs": {
+    "recommended": "1920 x 1080 px",
+    "ratio": "16:9 landscape",
+    "safeZone": "Keep important text inside the center 60% width and center 72% height.",
+    "formats": "PNG, JPG, JPEG, WebP, AVIF, or SVG",
+    "maxGuidance": "Use compressed WebP/JPG under 500 KB where possible. PNG is okay for graphic posters."
+  }
+}

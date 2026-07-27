@@ -69,6 +69,20 @@ const escapeHtml = (value) =>
     return entities[character];
   });
 
+
+const fetchSitePayload = async () => {
+  const sources = ["/api/site", "data/site-static.json"];
+  for (const source of sources) {
+    try {
+      const response = await fetch(source);
+      if (!response.ok) continue;
+      return await response.json();
+    } catch (error) {
+      // Try the next source.
+    }
+  }
+  throw new Error("Site API unavailable");
+};
 const params = new URLSearchParams(window.location.search);
 const productId = params.get("product") || "law";
 
@@ -108,9 +122,7 @@ const loadProduct = async () => {
   renderProduct(fallback, productCatalog[productId] ? productId : "law");
 
   try {
-    const response = await fetch("/api/site");
-    if (!response.ok) throw new Error("Site API unavailable");
-    const site = await response.json();
+    const site = await fetchSitePayload();
     const product = site.products.find((item) => item.id === productId);
     if (!product) return;
     renderProduct({
@@ -126,3 +138,4 @@ const loadProduct = async () => {
 };
 
 loadProduct();
+

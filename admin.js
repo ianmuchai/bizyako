@@ -5,6 +5,14 @@ const statusText = document.querySelector("[data-admin-status]");
 
 let slides = [];
 
+const staticPosterSpecs = {
+  recommended: "1920 x 1080 px",
+  ratio: "16:9 landscape",
+  safeZone: "Keep important text inside the center 60% width and center 72% height.",
+  formats: "PNG, JPG, JPEG, WebP, AVIF, or SVG",
+  maxGuidance: "Use compressed WebP/JPG under 500 KB where possible. PNG is okay for graphic posters.",
+};
+
 const escapeHtml = (value) =>
   String(value || "").replace(/[&<>"']/g, (character) => {
     const entities = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" };
@@ -133,11 +141,22 @@ const renderSlides = () => {
 };
 
 async function loadCarousel() {
-  const response = await fetch("/api/carousel");
-  const payload = await response.json();
-  slides = (payload.slides || []).slice(0, 5);
-  renderSpecs(payload.posterSpecs);
-  renderSlides();
+  try {
+    const response = await fetch("/api/carousel");
+    if (!response.ok) throw new Error("Carousel API unavailable");
+    const payload = await response.json();
+    slides = (payload.slides || []).slice(0, 5);
+    renderSpecs(payload.posterSpecs || staticPosterSpecs);
+    renderSlides();
+    return;
+  } catch (error) {
+    const response = await fetch("data/carouselSlides.json");
+    const staticSlides = await response.json();
+    slides = (Array.isArray(staticSlides) ? staticSlides : []).slice(0, 5);
+    renderSpecs(staticPosterSpecs);
+    renderSlides();
+    statusText.textContent = "Static hosting mode: preview and dimension checks work here, but saving requires the local BizYako Node server.";
+  }
 }
 
 saveButton.addEventListener("click", async () => {
@@ -160,3 +179,4 @@ saveButton.addEventListener("click", async () => {
 loadCarousel().catch(() => {
   statusText.textContent = "Could not load carousel data.";
 });
+

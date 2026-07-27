@@ -156,6 +156,32 @@ const escapeHtml = (value) =>
     };
     return entities[character];
   });
+const openEmailFallback = (payload, fallbackButton, resetText) => {
+  const subject = encodeURIComponent(`BizYako inquiry: ${payload.need || "Consultation"}`);
+  const body = encodeURIComponent(`Name: ${payload.name || ""}\nNeed: ${payload.need || ""}\n\n${payload.message || ""}`);
+  if (fallbackButton) fallbackButton.textContent = "Opening email...";
+  window.location.href = `mailto:hello@bizyako.com?subject=${subject}&body=${body}`;
+  window.setTimeout(() => {
+    if (fallbackButton && resetText) {
+      fallbackButton.textContent = resetText;
+      fallbackButton.disabled = false;
+    }
+  }, 1600);
+};
+
+const fetchSitePayload = async () => {
+  const sources = ["/api/site", "data/site-static.json"];
+  for (const source of sources) {
+    try {
+      const response = await fetch(source);
+      if (!response.ok) continue;
+      return await response.json();
+    } catch (error) {
+      // Try the next source.
+    }
+  }
+  throw new Error("Could not load site data");
+};
 
 const fallbackProducts = [
   {
@@ -442,7 +468,8 @@ leadForm?.addEventListener("submit", async (event) => {
       return;
     }
   } catch (error) {
-    button.textContent = "Backend unavailable";
+    openEmailFallback(payload, button, "Send product brief");
+    return;
   }
 
   setTimeout(() => {
@@ -486,9 +513,7 @@ const loadSiteData = async () => {
   hydrateProducts(fallbackProducts);
 
   try {
-    const response = await fetch("/api/site");
-    if (!response.ok) throw new Error("Could not load site API data");
-    const site = await response.json();
+    const site = await fetchSitePayload();
 
     hydrateProducts(site.products);
     hydrateHeroSlides(site.carouselSlides);
@@ -595,7 +620,11 @@ demoForm?.addEventListener("submit", async (event) => {
       return;
     }
   } catch (error) {
-    button.textContent = "Backend unavailable";
+    openEmailFallback(payload, button, "Sign up and unlock demo");
+    window.setTimeout(() => {
+      window.location.href = pendingDemoUrl;
+    }, 900);
+    return;
   }
 
   setTimeout(() => {
@@ -623,7 +652,8 @@ contactForm.addEventListener("submit", async (event) => {
     button.textContent = result.ok ? "Request received" : "Check your details";
     if (result.ok) contactForm.reset();
   } catch (error) {
-    button.textContent = "Backend unavailable";
+    openEmailFallback(payload, button, "Request consultation");
+    return;
   }
 
   setTimeout(() => {
@@ -638,6 +668,8 @@ startHeroCarousel();
 loadSiteData();
 syncBackendStatus();
 revealSections();
+
+
 
 
 
