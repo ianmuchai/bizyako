@@ -18,7 +18,7 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260731-1" />
+    <link rel="stylesheet" href="styles.css?v=20260731-2" />
   </head>
   <body>
     <header class="site-header" data-header>
@@ -286,6 +286,10 @@
           </div>
         </div>
         <form class="contact-form">
+          <div class="form-honeypot" aria-hidden="true">
+            <label>Website<input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
+          </div>
+          <input type="hidden" name="formStartedAt" value="" />
           <label>
             Name
             <input type="text" name="name" placeholder="Your name" required />
@@ -434,6 +438,10 @@
           Share the product direction, modules, and timeline. We will turn it into a focused consultation request.
         </p>
         <form class="lead-form" data-lead-form>
+          <div class="form-honeypot" aria-hidden="true">
+            <label>Website<input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
+          </div>
+          <input type="hidden" name="formStartedAt" value="" />
           <div class="lead-form-grid">
             <label>
               Your name
@@ -515,6 +523,10 @@
           Sign up to open the relevant product preview. We will also use your request to prepare sample workflows and a guided walkthrough tailored to your business.
         </p>
         <form class="demo-form" data-demo-form>
+          <div class="form-honeypot" aria-hidden="true">
+            <label>Website<input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
+          </div>
+          <input type="hidden" name="formStartedAt" value="" />
           <label>
             Work email
             <input type="email" name="email" placeholder="you@company.com" required />
@@ -533,15 +545,7 @@
         </form>
       </section>
     </div>
-    <script>
-      if ("serviceWorker" in navigator) {
-        window.addEventListener("load", () => {
-          navigator.serviceWorker.register("/service-worker.js").catch((error) => {
-            console.warn("Service worker registration failed", error);
-          });
-        });
-      }
-    </script>    <script src="script.js?v=20260727-2"></script>
+    <script src="script.js?v=20260731-2"></script>
   </body>
 </html>
 

@@ -3,37 +3,62 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow, noarchive" />
     <title>BizYako Carousel Admin</title>
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="icon" href="/assets/icons/bizyako-192.png" />
+    <link rel="stylesheet" href="styles.css?v=20260731-2" />
   </head>
   <body class="admin-page">
-    <main class="admin-shell">
-      <section class="admin-hero-card">
-        <div>
-          <p class="eyebrow">Incognito Admin</p>
-          <h1>Carousel poster manager</h1>
-          <p>Manage the 5 hero carousel posters, replace images, and confirm the correct poster dimensions before publishing.</p>
+    <main class="admin-access-shell">
+      <section class="admin-login-panel" data-admin-login aria-labelledby="admin-login-title">
+        <div class="admin-login-brand">
+          <span class="brand-logo"><img src="assets/bizyako-logo.png" alt="BizYako logo" /></span>
+          <span>bizYako</span>
         </div>
-        <a class="button secondary" href="/">Back to site</a>
+        <p class="eyebrow">Secure Administration</p>
+        <h1 id="admin-login-title">Carousel workspace</h1>
+        <p>Sign in to manage the five homepage posters and review their desktop and mobile design dimensions.</p>
+        <form class="admin-login-form" data-admin-login-form>
+          <label>
+            Admin password
+            <input type="password" name="password" autocomplete="current-password" required />
+          </label>
+          <button class="button primary" type="submit">Sign in securely</button>
+        </form>
+        <p class="admin-login-status" data-admin-login-status role="status" aria-live="polite"></p>
+        <a class="admin-return-link" href="/">Return to BizYako</a>
       </section>
 
-      <section class="admin-guidance-panel" aria-label="Carousel poster design guidance">
-        <div>
-          <p class="eyebrow">Poster Requirements</p>
-          <h2>Design every carousel poster at 1920 x 1080 px.</h2>
-          <p>Use a 16:9 landscape canvas. Keep important text, faces, and product visuals inside the center safe area so the hero crop works on mobile and desktop.</p>
+      <div class="admin-shell" data-admin-shell hidden inert>
+        <section class="admin-hero-card">
+          <div>
+            <p class="eyebrow">Private Workspace</p>
+            <h1>Carousel poster manager</h1>
+            <p>Manage all five hero posters, replace images, and check the correct canvas dimensions before publishing.</p>
+          </div>
+          <div class="admin-session-actions">
+            <a class="button secondary" href="/">View site</a>
+            <button class="button secondary" type="button" data-admin-logout>Sign out</button>
+          </div>
+        </section>
+
+        <section class="admin-guidance-panel" aria-label="Carousel poster design guidance">
+          <div>
+            <p class="eyebrow">Poster Requirements</p>
+            <h2>Design every carousel poster at 1920 x 1080 px.</h2>
+            <p>Use a 16:9 landscape canvas. Keep important text, faces, and product visuals inside the center safe area so the hero crop works on mobile and desktop.</p>
+          </div>
+          <section class="admin-spec-grid" data-poster-specs></section>
+        </section>
+
+        <section class="admin-editor-grid" data-slide-editor></section>
+
+        <div class="admin-save-bar">
+          <p data-admin-status role="status" aria-live="polite">Your authenticated carousel workspace is ready.</p>
+          <button class="button primary" type="button" data-save-carousel>Save carousel posters</button>
         </div>
-        <section class="admin-spec-grid" data-poster-specs></section>
-      </section>
-
-      <section class="admin-editor-grid" data-slide-editor></section>
-
-      <div class="admin-save-bar">
-        <p data-admin-status>Use the local admin to save poster image changes. The live Vercel admin is read-only and cannot write files back to GitHub.</p>
-        <button class="button primary" type="button" data-save-carousel>Save carousel posters</button>
       </div>
     </main>
-    <script src="admin.js"></script>
+    <script src="admin.js?v=20260731-2"></script>
   </body>
 </html>
-
