@@ -6,11 +6,14 @@ ServerSignature Off
   RewriteEngine On
   RewriteCond %{REQUEST_METHOD} ^TRACE$ [NC]
   RewriteRule .* - [R=405,L]
+  RewriteRule ^(?:lib|scripts|tests|docs|\.github|\.security|\.worktrees|dist)(?:/|$) - [R=404,L]
+  RewriteRule ^data/(?!site-static\.json$).* - [R=404,L]
+  RewriteRule ^api/.*\.js$ - [R=404,L]
   RewriteRule ^product-demo/?$ product-demo.html [L,QSA]
   RewriteRule ^by-admin/?$ by-admin.html [L,QSA]
 </IfModule>
 
-<FilesMatch "^(server\.js|package(?:-lock)?\.json|vercel\.json|README\.md|\.gitignore)$">
+<FilesMatch "^(server\.js|package(?:-lock)?\.json|vercel\.json|README\.md|SECURITY\.md|\.gitignore|\.vercelignore)$">
   Require all denied
 </FilesMatch>
 

@@ -94,3 +94,10 @@ test("Vercel publishes only the approved static surface", () => {
     fs.rmSync(output, { recursive: true, force: true });
   }
 });
+test("cPanel rejects private source paths before the Node runtime", () => {
+  const apache = read(".htaccess");
+  assert.match(apache, /RewriteRule \^\(\?:lib\|scripts\|tests\|docs\|\\\.github\|\\\.security\|\\\.worktrees\|dist\)/);
+  assert.match(apache, /RewriteRule \^data\/\(\?!site-static\\\.json\$\)/);
+  assert.match(apache, /RewriteRule \^api\/\.\*\\\.js\$/);
+  assert.match(apache, /SECURITY\\\.md/);
+});
