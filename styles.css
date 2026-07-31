@@ -1628,14 +1628,20 @@ body { background: #f6faf9; }
 .contact-section {
   position: relative;
   isolation: isolate;
+  overflow: clip;
+}
+.contact-section > * {
+  position: relative;
+  z-index: 1;
 }
 .contact-section::before {
   position: absolute;
-  inset: -72px 0 auto;
-  height: 72px;
+  inset: 0 0 auto;
+  z-index: 0;
+  height: 48px;
   pointer-events: none;
   content: '';
-  background: linear-gradient(180deg, rgba(234, 248, 244, 0), rgba(6, 19, 27, .32) 58%, #06131b 100%);
+  background: linear-gradient(180deg, #eaf4fa 0%, rgba(57, 89, 101, .72) 56%, #06131b 100%);
 }
 .site-footer { width: 100%; }
 .footer-grid,
@@ -1794,8 +1800,8 @@ body { background: #f6faf9; }
   .support-action { width: 50px; height: 50px; }
   .support-action svg { width: 30px; height: 30px; }
   .contact-section::before {
-    inset: -48px 0 auto;
-    height: 48px;
+    inset: 0 0 auto;
+    height: 32px;
   }
   .chat-panel {
     right: 12px;

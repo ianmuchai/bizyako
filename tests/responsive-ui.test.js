@@ -22,10 +22,17 @@ test("rotating hero messages use a balanced professional type scale", () => {
   assert.match(finalVisualSystem, /\.hero h1\s*\{[^}]*max-width:\s*620px;[^}]*font-size:\s*3rem;/s);
   assert.match(finalVisualSystem, /\.hero-copy\s*\{[^}]*max-width:\s*570px;[^}]*font-size:\s*\.96rem;[^}]*line-height:\s*1\.52;/s);
 });
-test("contact section provides a responsive light-to-dark transition band", () => {
+test("contact transition stays inside the dark section and behind its content", () => {
   const finalVisualSystem = styles.slice(styles.indexOf("/* 2026 wide visual system and support refinement */"));
+  const transitionRule = finalVisualSystem.match(/\.contact-section::before\s*\{[^}]*\}/s);
 
-  assert.match(finalVisualSystem, /\.contact-section::before\s*\{[^}]*inset:\s*-72px 0 auto;[^}]*height:\s*72px;[^}]*linear-gradient/s);
-  assert.match(finalVisualSystem, /@media \(max-width:\s*620px\)[\s\S]*?\.contact-section::before\s*\{[^}]*inset:\s*-48px 0 auto;[^}]*height:\s*48px/s);
-  assert.match(finalVisualSystem, /@media \(max-width:\s*620px\)[\s\S]*?\.support-action svg\s*\{[^}]*width:\s*30px;[^}]*height:\s*30px/s);
+  assert.ok(transitionRule, "expected a contact transition rule");
+  assert.match(transitionRule[0], /inset:\s*0 0 auto;/);
+  assert.match(transitionRule[0], /height:\s*48px;/);
+  assert.match(transitionRule[0], /pointer-events:\s*none;/);
+  assert.match(transitionRule[0], /z-index:\s*0;/);
+  assert.match(transitionRule[0], /linear-gradient/);
+  assert.doesNotMatch(transitionRule[0], /(?:backdrop-)?filter\s*:/);
+  assert.match(finalVisualSystem, /\.contact-section\s*>\s*\*\s*\{[^}]*position:\s*relative;[^}]*z-index:\s*1;/s);
+  assert.match(finalVisualSystem, /@media \(max-width:\s*620px\)[\s\S]*?\.contact-section::before\s*\{[^}]*inset:\s*0 0 auto;[^}]*height:\s*32px/s);
 });
