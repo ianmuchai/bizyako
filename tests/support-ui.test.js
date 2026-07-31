@@ -29,3 +29,14 @@ test("assistant panel is bottom anchored with compact type", () => {
   assert.match(styles, /\.chat-panel\s*\{[^}]*bottom:/s);
   assert.match(styles, /\.chat-panel\s*\{[^}]*font-size:\s*0\.86rem/s);
 });
+test("standalone support glyphs retain contrast across light and dark sections", () => {
+  const styles = fs.readFileSync(path.join(root, "styles.css"), "utf8");
+  const finalVisualSystem = styles.slice(styles.indexOf("/* 2026 wide visual system and support refinement */"));
+
+  assert.match(finalVisualSystem, /\.support-action svg\s*\{[^}]*width:\s*32px;[^}]*height:\s*32px;[^}]*drop-shadow\(0 0 1px rgba\(255, 255, 255, \.95\)\)[^}]*drop-shadow\(0 3px 8px rgba\(1, 10, 15, \.66\)\)/s);
+  assert.match(finalVisualSystem, /\.support-action svg path\[stroke\]\s*\{[^}]*stroke-width:\s*2\.65/s);
+  const supportBlock = finalVisualSystem.match(/\.support-action\s*\{([^}]*)\}/s);
+  assert.ok(supportBlock);
+  assert.match(supportBlock[1], /background:\s*transparent;/);
+  assert.doesNotMatch(supportBlock[1], /background:\s*(?:#|rgb|hsl|linear|radial|url)/i);
+});

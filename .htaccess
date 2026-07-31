@@ -1,17 +1,41 @@
 DirectoryIndex index.html
 Options -Indexes
+ServerSignature Off
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
+  RewriteCond %{REQUEST_METHOD} ^TRACE$ [NC]
+  RewriteRule .* - [R=405,L]
   RewriteRule ^product-demo/?$ product-demo.html [L,QSA]
   RewriteRule ^by-admin/?$ by-admin.html [L,QSA]
 </IfModule>
 
+<FilesMatch "^(server\.js|package(?:-lock)?\.json|vercel\.json|README\.md|\.gitignore)$">
+  Require all denied
+</FilesMatch>
+
 <IfModule mod_headers.c>
-  <FilesMatch "\.(css|js|png|jpg|jpeg|webp|avif|svg)$">
-    Header set Cache-Control "public, max-age=31536000"
+  Header always unset X-Powered-By
+  Header always set Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://wa.me https://api.whatsapp.com; manifest-src 'self'; worker-src 'self'; frame-src 'none'; upgrade-insecure-requests"
+  Header always set Cross-Origin-Opener-Policy "same-origin"
+  Header always set Cross-Origin-Resource-Policy "same-origin"
+  Header always set Origin-Agent-Cluster "?1"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "DENY"
+  Header always set X-Permitted-Cross-Domain-Policies "none"
+
+  <FilesMatch "\.(css|js|png|jpg|jpeg|webp|avif|ico)$">
+    Header set Cache-Control "public, max-age=3600"
   </FilesMatch>
-  <FilesMatch "\.(html|json)$">
-    Header set Cache-Control "no-store"
+  <FilesMatch "\.(html|json|webmanifest)$">
+    Header set Cache-Control "no-store, max-age=0"
+  </FilesMatch>
+  <FilesMatch "^(by-admin\.html|admin\.js)$">
+    Header always set Cache-Control "no-store, max-age=0"
+    Header always set Pragma "no-cache"
+    Header always set X-Robots-Tag "noindex, nofollow, noarchive"
   </FilesMatch>
 </IfModule>

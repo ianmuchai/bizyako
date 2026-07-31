@@ -23,19 +23,22 @@ test("service worker protects private admin and mutation routes from caching", (
   assert.match(source, /index\.html/);
 });
 
-test("public pages link the manifest and register the service worker", () => {
+test("public pages link the manifest and register the service worker externally", () => {
   const homepage = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const demo = fs.readFileSync(path.join(root, "product-demo.html"), "utf8");
+  const homepageScript = fs.readFileSync(path.join(root, "script.js"), "utf8");
+  const demoScript = fs.readFileSync(path.join(root, "product-demo.js"), "utf8");
   assert.match(homepage, /rel="manifest"/);
-  assert.match(homepage, /service-worker\.js/);
   assert.match(demo, /rel="manifest"/);
+  assert.match(homepageScript, /navigator\.serviceWorker\.register\("\/service-worker\.js"\)/);
+  assert.match(demoScript, /navigator\.serviceWorker\.register\("\/service-worker\.js"\)/);
 });
 test("public assets and shell cache are versioned for reliable updates", () => {
   const homepage = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const demo = fs.readFileSync(path.join(root, "product-demo.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "service-worker.js"), "utf8");
-  assert.match(homepage, /styles\.css\?v=20260731-1/);
-  assert.match(homepage, /script\.js\?v=20260727/);
-  assert.match(demo, /styles\.css\?v=20260731-1/);
-  assert.match(worker, /bizyako-shell-v4/);
+  assert.match(homepage, /styles\.css\?v=20260731-2/);
+  assert.match(homepage, /script\.js\?v=20260731/);
+  assert.match(demo, /styles\.css\?v=20260731-2/);
+  assert.match(worker, /bizyako-shell-v5/);
 });

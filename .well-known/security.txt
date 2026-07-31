@@ -1,0 +1,4 @@
+Contact: mailto:hello@bizyako.com
+Expires: 2027-07-31T23:59:59Z
+Preferred-Languages: en
+Canonical: https://bizyako.com/.well-known/security.txt

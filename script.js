@@ -26,6 +26,24 @@ const leadBuilder = document.querySelector("[data-lead-builder]");
 const leadForm = document.querySelector("[data-lead-form]");
 const openLeadButtons = document.querySelectorAll("[data-open-lead-builder]");
 const installAppButton = document.querySelector("[data-install-app]");
+const secureForms = [contactForm, demoForm, leadForm].filter(Boolean);
+
+const prepareSecureForm = (form) => {
+  const startedAt = form.querySelector('[name="formStartedAt"]');
+  const website = form.querySelector('[name="website"]');
+  if (startedAt) startedAt.value = String(Date.now());
+  if (website) website.value = "";
+};
+
+secureForms.forEach(prepareSecureForm);
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/service-worker.js").catch((error) => {
+      console.warn("Service worker registration failed", error);
+    });
+  });
+}
 
 let products = {};
 let activeProductId = "law";
@@ -517,6 +535,8 @@ leadForm?.addEventListener("submit", async (event) => {
   const payload = {
     name: data.name,
     need: `Product definition: ${data.product}`,
+    website: data.website,
+    formStartedAt: Number(data.formStartedAt),
     message: [
       `Product definition lead for ${data.company}.`,
       `Contact: ${data.contact}.`,
@@ -544,6 +564,7 @@ leadForm?.addEventListener("submit", async (event) => {
       appendChatMessage("bot", "Your product brief has been sent. BizYako will use it to prepare the right consultation path.");
       setTimeout(() => {
         leadForm.reset();
+        prepareSecureForm(leadForm);
         closeLeadBuilder();
         button.textContent = "Send product brief";
         button.disabled = false;
@@ -680,6 +701,8 @@ demoForm?.addEventListener("submit", async (event) => {
   const payload = {
     name: data.name,
     need: data.need,
+    website: data.website,
+    formStartedAt: Number(data.formStartedAt),
     message: `${data.message} Company: ${data.company}. Email: ${data.email}.`,
   };
 
@@ -698,6 +721,7 @@ demoForm?.addEventListener("submit", async (event) => {
       button.textContent = "Opening demo preview...";
       setTimeout(() => {
         demoForm.reset();
+        prepareSecureForm(demoForm);
         window.location.href = pendingDemoUrl;
       }, 900);
       return;
@@ -719,7 +743,8 @@ demoForm?.addEventListener("submit", async (event) => {
 contactForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const button = contactForm.querySelector("button");
-  const payload = Object.fromEntries(new FormData(contactForm).entries());
+  const data = Object.fromEntries(new FormData(contactForm).entries());
+  const payload = { ...data, website: data.website, formStartedAt: Number(data.formStartedAt) };
 
   button.textContent = "Sending...";
   button.disabled = true;
@@ -733,7 +758,10 @@ contactForm.addEventListener("submit", async (event) => {
     const result = await response.json();
 
     button.textContent = result.ok ? "Request received" : "Check your details";
-    if (result.ok) contactForm.reset();
+    if (result.ok) {
+      contactForm.reset();
+      prepareSecureForm(contactForm);
+    }
   } catch (error) {
     openEmailFallback(payload, button, "Request consultation");
     return;

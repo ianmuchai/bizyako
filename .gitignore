@@ -8,3 +8,6 @@ Thumbs.db
 .vercel
 .worktrees/
 .env*
+BIZYAKO_SECURITY_SETUP.txt
+.security/
+bizyako-namecheap-secure-*.zip
