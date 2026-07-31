@@ -43,6 +43,7 @@ const PUBLIC_FILES = new Set([
   "/manifest.webmanifest",
   "/service-worker.js",
   "/data/site-static.json",
+  "/.well-known/security.txt",
 ]);
 const ROUTE_FILES = new Map([
   ["/", "/index.html"],
@@ -63,6 +64,7 @@ const mimeTypes = {
   ".webp": "image/webp",
   ".avif": "image/avif",
   ".ico": "image/x-icon",
+  ".txt": "text/plain; charset=utf-8",
 };
 
 const configuredOrigins = String(process.env.BIZYAKO_ALLOWED_ORIGINS || "")
