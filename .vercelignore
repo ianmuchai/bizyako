@@ -1,0 +1,13 @@
+.vercel/
+.git/
+.env*
+.security/
+BIZYAKO_SECURITY_SETUP.txt
+.worktrees/
+node_modules/
+tests/
+docs/
+*.zip
+namecheap-*/
+dist/
+*.log

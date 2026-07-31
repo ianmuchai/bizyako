@@ -1,6 +1,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
+const os = require("node:os");
 const path = require("node:path");
 
 const root = path.join(__dirname, "..");
@@ -49,4 +50,47 @@ test("the owner runbook covers setup, rotation, lockout, hosting, firewall, and 
     assert.match(policy, new RegExp(requirement, "i"));
   }
   assert.match(read(".gitignore"), /BIZYAKO_SECURITY_SETUP\.txt/);
+});
+
+test("Vercel publishes only the approved static surface", () => {
+  const ignorePath = path.join(root, ".vercelignore");
+  const buildPath = path.join(root, "scripts", "build-vercel-static.js");
+  assert.equal(fs.existsSync(ignorePath), true, "expected a repository-level .vercelignore");
+  assert.equal(fs.existsSync(buildPath), true, "expected a Vercel static-output builder");
+
+  const ignore = fs.readFileSync(ignorePath, "utf8");
+  for (const requirement of [".env*", ".security/", "BIZYAKO_SECURITY_SETUP.txt", ".worktrees/", "node_modules/", "tests/", "docs/", "*.zip", "namecheap-*/"]) {
+    assert.ok(ignore.split(/\r?\n/).includes(requirement), `expected ${requirement} in .vercelignore`);
+  }
+
+  const config = JSON.parse(read("vercel.json"));
+  assert.equal(config.buildCommand, "node scripts/build-vercel-static.js");
+  assert.equal(config.outputDirectory, "dist");
+
+  const { buildStaticOutput } = require(buildPath);
+  const output = fs.mkdtempSync(path.join(os.tmpdir(), "bizyako-vercel-output-"));
+  try {
+    buildStaticOutput({ root, output });
+    for (const publicFile of [
+      "index.html",
+      "by-admin.html",
+      "product-demo.html",
+      "styles.css",
+      "script.js",
+      "admin.js",
+      "product-demo.js",
+      "service-worker.js",
+      "manifest.webmanifest",
+      path.join("assets", "bizyako-logo.png"),
+      path.join("data", "site-static.json"),
+      path.join(".well-known", "security.txt"),
+    ]) {
+      assert.equal(fs.existsSync(path.join(output, publicFile)), true, `expected public output ${publicFile}`);
+    }
+    for (const privatePath of ["server.js", "SECURITY.md", "lib", "scripts", "tests", path.join("data", "siteData.js"), path.join("data", "carouselSlides.json")]) {
+      assert.equal(fs.existsSync(path.join(output, privatePath)), false, `did not expect private output ${privatePath}`);
+    }
+  } finally {
+    fs.rmSync(output, { recursive: true, force: true });
+  }
 });

@@ -11,3 +11,4 @@ Thumbs.db
 BIZYAKO_SECURITY_SETUP.txt
 .security/
 bizyako-namecheap-secure-*.zip
+dist/
