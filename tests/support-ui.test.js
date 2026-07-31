@@ -14,9 +14,13 @@ test("chat launcher uses three animated conversation dots", () => {
   assert.match(styles, /@keyframes chatDot/);
 });
 
-test("floating support controls have no visible boundary", () => {
+test("floating support controls expose standalone glyphs without launcher surfaces", () => {
   const styles = fs.readFileSync(path.join(root, "styles.css"), "utf8");
-  assert.match(styles, /\.support-action\s*\{[^}]*border:\s*0;/s);
+  const finalVisualSystem = styles.slice(styles.indexOf("/* 2026 wide visual system and support refinement */"));
+
+  assert.match(finalVisualSystem, /\.support-action\s*\{[^}]*width:\s*54px;[^}]*height:\s*54px;[^}]*border:\s*0;[^}]*border-radius:\s*0;[^}]*background:\s*transparent;[^}]*box-shadow:\s*none;/s);
+  assert.match(finalVisualSystem, /\.whatsapp-action\s*\{[^}]*background:\s*transparent;/s);
+  assert.match(finalVisualSystem, /\.chat-action\s*\{[^}]*background:\s*transparent;/s);
   assert.match(styles, /\.whatsapp-action::before,[\s\S]*display:\s*none;/);
 });
 
