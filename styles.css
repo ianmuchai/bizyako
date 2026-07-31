@@ -1625,6 +1625,18 @@ body { background: #f6faf9; }
     #06131b;
 }
 .process-section { background: linear-gradient(110deg, #eaf8f4, #fff 58%, #eaf4fa); }
+.contact-section {
+  position: relative;
+  isolation: isolate;
+}
+.contact-section::before {
+  position: absolute;
+  inset: -72px 0 auto;
+  height: 72px;
+  pointer-events: none;
+  content: '';
+  background: linear-gradient(180deg, rgba(234, 248, 244, 0), rgba(6, 19, 27, .32) 58%, #06131b 100%);
+}
 .site-footer { width: 100%; }
 .footer-grid,
 .footer-bottom {
@@ -1662,9 +1674,12 @@ body { background: #f6faf9; }
 .whatsapp-action::before,
 .chat-action::before { display: none; }
 .support-action svg {
-  width: 29px;
-  height: 29px;
-  filter: drop-shadow(0 7px 12px rgba(3, 16, 22, .2));
+  width: 32px;
+  height: 32px;
+  filter: drop-shadow(0 0 1px rgba(255, 255, 255, .95)) drop-shadow(0 3px 8px rgba(1, 10, 15, .66));
+}
+.support-action svg path[stroke] {
+  stroke-width: 2.65;
 }
 .support-action:focus-visible {
   outline: 2px solid rgba(8, 184, 147, .8);
@@ -1777,6 +1792,11 @@ body { background: #f6faf9; }
   .footer-bottom { width: calc(100% - 36px); }
   .support-hub { right: 12px; bottom: 12px; }
   .support-action { width: 50px; height: 50px; }
+  .support-action svg { width: 30px; height: 30px; }
+  .contact-section::before {
+    inset: -48px 0 auto;
+    height: 48px;
+  }
   .chat-panel {
     right: 12px;
     bottom: 72px;

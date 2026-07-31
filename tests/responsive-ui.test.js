@@ -22,3 +22,10 @@ test("rotating hero messages use a balanced professional type scale", () => {
   assert.match(finalVisualSystem, /\.hero h1\s*\{[^}]*max-width:\s*620px;[^}]*font-size:\s*3rem;/s);
   assert.match(finalVisualSystem, /\.hero-copy\s*\{[^}]*max-width:\s*570px;[^}]*font-size:\s*\.96rem;[^}]*line-height:\s*1\.52;/s);
 });
+test("contact section provides a responsive light-to-dark transition band", () => {
+  const finalVisualSystem = styles.slice(styles.indexOf("/* 2026 wide visual system and support refinement */"));
+
+  assert.match(finalVisualSystem, /\.contact-section::before\s*\{[^}]*inset:\s*-72px 0 auto;[^}]*height:\s*72px;[^}]*linear-gradient/s);
+  assert.match(finalVisualSystem, /@media \(max-width:\s*620px\)[\s\S]*?\.contact-section::before\s*\{[^}]*inset:\s*-48px 0 auto;[^}]*height:\s*48px/s);
+  assert.match(finalVisualSystem, /@media \(max-width:\s*620px\)[\s\S]*?\.support-action svg\s*\{[^}]*width:\s*30px;[^}]*height:\s*30px/s);
+});
