@@ -130,7 +130,8 @@ const renderProduct = (product, id) => {
     .map((key) => {
       const item = productCatalog[key];
       const active = key === id ? " active" : "";
-      return `<a class="demo-switch-pill${active}" href="product-demo.html?product=${key}">${escapeHtml(item.label)}</a>`;
+      const current = key === id ? ' aria-current="page"' : "";
+      return `<a class="demo-switch-pill${active}"${current} href="product-demo.html?product=${key}">${escapeHtml(item.label)}</a>`;
     })
     .join("");
 

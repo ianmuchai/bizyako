@@ -1793,3 +1793,50 @@ body { background: #f6faf9; }
 @media (max-width: 620px) {
   .upgraded-hero { grid-template-columns: minmax(0, 1fr); }
 }
+/* Independent review hardening */
+.demo-header {
+  position: fixed;
+  margin-top: 0;
+  grid-template-columns: auto minmax(320px, 1fr) auto;
+}
+.demo-page-copy,
+.demo-product-console {
+  min-width: 0;
+  width: 100%;
+}
+.demo-product-switcher {
+  max-width: 100%;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.demo-product-switcher::-webkit-scrollbar { display: none; }
+.demo-switch-pill { flex: 0 0 auto; min-height: 44px; }
+.chat-quick-actions button,
+.chat-inline-actions button,
+.chat-inline-actions a { min-height: 44px; }
+.chat-footer-actions .button { min-height: 44px; }
+
+@media (max-width: 900px) {
+  .demo-page-hero { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 980px) {
+  .demo-header { grid-template-columns: auto 1fr auto; }
+  .demo-header .nav-cta {
+    display: inline-flex;
+    grid-column: 3;
+    justify-self: end;
+  }
+}
+
+@media (max-width: 620px) {
+  .install-app { min-height: 44px; }
+  .install-app.available { grid-column: 2; justify-self: end; }
+  .menu-button {
+    grid-column: 3;
+    justify-self: end;
+    width: 44px;
+    height: 44px;
+  }
+}

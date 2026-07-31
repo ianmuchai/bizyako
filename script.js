@@ -1,4 +1,5 @@
 document.body.classList.add("js-enabled");
+const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const header = document.querySelector("[data-header]");
 const menuButton = document.querySelector("[data-menu-button]");
 const tabs = document.querySelectorAll("[data-product]");
@@ -314,13 +315,18 @@ const activateProduct = (id, shouldScroll = false) => {
   });
 
   document.querySelectorAll("[data-console-product]").forEach((button) => {
-    button.classList.toggle("active", button.dataset.consoleProduct === id);
+    const isActive = button.dataset.consoleProduct === id;
+    button.classList.toggle("active", isActive);
+    if (button.matches("button")) button.setAttribute("aria-pressed", isActive ? "true" : "false");
   });
 
   renderProduct(id);
 
   if (shouldScroll) {
-    document.querySelector("#products").scrollIntoView({ behavior: "smooth", block: "start" });
+    document.querySelector("#products").scrollIntoView({
+      behavior: prefersReducedMotion ? "auto" : "smooth",
+      block: "start",
+    });
   }
 };
 

@@ -37,5 +37,5 @@ test("public assets and shell cache are versioned for reliable updates", () => {
   assert.match(homepage, /styles\.css\?v=20260727/);
   assert.match(homepage, /script\.js\?v=20260727/);
   assert.match(demo, /styles\.css\?v=20260727/);
-  assert.match(worker, /bizyako-shell-v2/);
+  assert.match(worker, /bizyako-shell-v3/);
 });
