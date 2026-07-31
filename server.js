@@ -1,12 +1,56 @@
-const http = require("http");
-const fs = require("fs");
-const path = require("path");
+"use strict";
 
-const PORT = process.env.PORT || 5173;
-const PUBLIC_ROOT = __dirname;
+const crypto = require("node:crypto");
+const fs = require("node:fs");
+const http = require("node:http");
+const path = require("node:path");
 
+const {
+  DEFAULT_SESSION_TTL_MS,
+  SESSION_COOKIE_NAME,
+  clearSessionCookie,
+  createRateLimiter,
+  createSession,
+  createSessionCookie,
+  fingerprintClient,
+  getClientAddress,
+  getSecurityHeaders,
+  logSecurityEvent,
+  parseCookies,
+  resolvePublicPath,
+  validateCarouselPayload,
+  validateContactPayload,
+  validateOrigin,
+  verifyPassword,
+  verifySession,
+} = require("./lib/security");
 const { getSitePayload, normalizeLead, getCarouselSlides, posterSpecs, saveCarouselSlides } = require("./data/siteData");
 
+const PORT = Number(process.env.PORT) || 5173;
+const PUBLIC_ROOT = __dirname;
+const IS_PRODUCTION = process.env.NODE_ENV === "production";
+const CONTACT_BODY_LIMIT = 32 * 1024;
+const CAROUSEL_BODY_LIMIT = 8 * 1024 * 1024;
+const AUTH_BODY_LIMIT = 4 * 1024;
+const PUBLIC_FILES = new Set([
+  "/index.html",
+  "/product-demo.html",
+  "/by-admin.html",
+  "/styles.css",
+  "/script.js",
+  "/product-demo.js",
+  "/admin.js",
+  "/manifest.webmanifest",
+  "/service-worker.js",
+  "/data/site-static.json",
+]);
+const ROUTE_FILES = new Map([
+  ["/", "/index.html"],
+  ["/product-demo", "/product-demo.html"],
+  ["/product-demo/", "/product-demo.html"],
+  ["/by-admin", "/by-admin.html"],
+  ["/by-admin/", "/by-admin.html"],
+]);
 const mimeTypes = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css; charset=utf-8",
@@ -18,128 +62,377 @@ const mimeTypes = {
   ".jpeg": "image/jpeg",
   ".webp": "image/webp",
   ".avif": "image/avif",
-  ".svg": "image/svg+xml; charset=utf-8",
   ".ico": "image/x-icon",
 };
 
-function sendJson(res, status, payload) {
-  res.writeHead(status, {
-    "Content-Type": "application/json; charset=utf-8",
-    "Cache-Control": "no-store",
-  });
+const configuredOrigins = String(process.env.BIZYAKO_ALLOWED_ORIGINS || "")
+  .split(",")
+  .map((value) => value.trim())
+  .filter(Boolean);
+const developmentOrigins = [`http://localhost:${PORT}`, `http://127.0.0.1:${PORT}`];
+const allowedOrigins = configuredOrigins.length ? configuredOrigins : IS_PRODUCTION ? [] : developmentOrigins;
+const adminPasswordHash = process.env.BIZYAKO_ADMIN_PASSWORD_HASH || "";
+const sessionSecret = process.env.BIZYAKO_SESSION_SECRET || "";
+const secureCookies = IS_PRODUCTION && process.env.BIZYAKO_FORCE_SECURE_COOKIE !== "false";
+const authConfigured = /^scrypt\$v1\$[A-Za-z0-9_-]+\$[A-Za-z0-9_-]+$/.test(adminPasswordHash)
+  && Buffer.byteLength(sessionSecret, "utf8") >= 32
+  && allowedOrigins.length > 0;
+const loginLimiter = createRateLimiter({ limit: 5, windowMs: 15 * 60 * 1000 });
+const contactLimiter = createRateLimiter({ limit: 6, windowMs: 10 * 60 * 1000 });
+
+class HttpError extends Error {
+  constructor(status, message) {
+    super(message);
+    this.status = status;
+  }
+}
+
+function mergeHeaders(res, headers) {
+  for (const [name, value] of Object.entries(headers)) res.setHeader(name, value);
+}
+
+function applySecurityHeaders(res, { admin = false } = {}) {
+  mergeHeaders(res, getSecurityHeaders({ admin, production: IS_PRODUCTION }));
+}
+
+function sendJson(res, status, payload, { admin = false, headers = {} } = {}) {
+  if (res.writableEnded) return;
+  applySecurityHeaders(res, { admin });
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  res.setHeader("Cache-Control", "no-store, max-age=0");
+  mergeHeaders(res, headers);
+  res.writeHead(status);
   res.end(JSON.stringify(payload));
 }
 
-function collectBody(req) {
+function sendText(res, status, message, { admin = false, headers = {} } = {}) {
+  if (res.writableEnded) return;
+  applySecurityHeaders(res, { admin });
+  res.setHeader("Content-Type", "text/plain; charset=utf-8");
+  res.setHeader("Cache-Control", "no-store, max-age=0");
+  mergeHeaders(res, headers);
+  res.writeHead(status);
+  res.end(message);
+}
+
+function isJsonRequest(req) {
+  const contentType = String(req.headers["content-type"] || "").split(";", 1)[0].trim().toLowerCase();
+  return contentType === "application/json";
+}
+
+function collectBody(req, maxBytes) {
   return new Promise((resolve, reject) => {
-    let body = "";
+    const chunks = [];
+    let bytes = 0;
+    let tooLarge = false;
+
     req.on("data", (chunk) => {
-      body += chunk;
-      if (body.length > 8_000_000) {
-        req.destroy();
-        reject(new Error("Request body too large"));
+      bytes += chunk.length;
+      if (bytes > maxBytes) {
+        tooLarge = true;
+        chunks.length = 0;
+        return;
       }
+      if (!tooLarge) chunks.push(chunk);
     });
-    req.on("end", () => resolve(body));
-    req.on("error", reject);
+    req.on("end", () => {
+      if (tooLarge) reject(new HttpError(413, "Request body too large."));
+      else resolve(Buffer.concat(chunks).toString("utf8"));
+    });
+    req.on("aborted", () => reject(new HttpError(400, "Request was interrupted.")));
+    req.on("error", () => reject(new HttpError(400, "Unable to read request.")));
   });
 }
 
-function serveFile(res, pathname) {
-  const routeFiles = {
-    "/": "/index.html",
-    "/product-demo": "/product-demo.html",
-    "/product-demo/": "/product-demo.html",
-    "/by-admin": "/by-admin.html",
-    "/by-admin/": "/by-admin.html",
-  };
-  const cleanPath = routeFiles[pathname] || pathname;
-  const filePath = path.normalize(path.join(PUBLIC_ROOT, cleanPath));
+async function parseJsonBody(req, maxBytes) {
+  if (!isJsonRequest(req)) throw new HttpError(415, "Content-Type must be application/json.");
+  const body = await collectBody(req, maxBytes);
+  if (!body) throw new HttpError(400, "A JSON request body is required.");
+  try {
+    return JSON.parse(body);
+  } catch {
+    throw new HttpError(400, "Invalid JSON request body.");
+  }
+}
 
-  if (!filePath.startsWith(PUBLIC_ROOT)) {
-    res.writeHead(403);
-    res.end("Forbidden");
+function requestFingerprint(req) {
+  return fingerprintClient(getClientAddress(req), sessionSecret || "bizyako-unconfigured-rate-key");
+}
+
+function originAllowed(req) {
+  return validateOrigin(req.headers.origin, allowedOrigins);
+}
+
+function safeEqual(left, right) {
+  if (typeof left !== "string" || typeof right !== "string") return false;
+  const leftBytes = Buffer.from(left);
+  const rightBytes = Buffer.from(right);
+  return leftBytes.length === rightBytes.length && crypto.timingSafeEqual(leftBytes, rightBytes);
+}
+
+function readSession(req) {
+  if (!authConfigured) return { ok: false };
+  const cookies = parseCookies(req.headers.cookie);
+  const token = cookies[secureCookies ? `__Host-${SESSION_COOKIE_NAME}` : SESSION_COOKIE_NAME]
+    || cookies[`__Host-${SESSION_COOKIE_NAME}`]
+    || cookies[SESSION_COOKIE_NAME];
+  if (!token) return { ok: false };
+  try {
+    return verifySession(token, { secret: sessionSecret });
+  } catch {
+    return { ok: false };
+  }
+}
+
+function requireOrigin(req, res, { admin = false } = {}) {
+  if (originAllowed(req)) return true;
+  logSecurityEvent("origin_rejected", { route: req.url, client: requestFingerprint(req) });
+  sendJson(res, 403, { ok: false, message: "Request not allowed." }, { admin });
+  return false;
+}
+
+function requireAdmin(req, res, { csrf = false } = {}) {
+  const session = readSession(req);
+  if (!session.ok) {
+    sendJson(res, 401, { ok: false, message: "Authentication required." }, { admin: true });
+    return null;
+  }
+  if (csrf && !safeEqual(req.headers["x-csrf-token"], session.csrfToken)) {
+    logSecurityEvent("csrf_rejected", { route: req.url, client: requestFingerprint(req) });
+    sendJson(res, 403, { ok: false, message: "Request not allowed." }, { admin: true });
+    return null;
+  }
+  return session;
+}
+
+function rateLimitResponse(res, result, { admin = false } = {}) {
+  const seconds = Math.max(1, Math.ceil(result.retryAfterMs / 1000));
+  sendJson(res, 429, { ok: false, message: "Too many requests. Please try again later." }, {
+    admin,
+    headers: { "Retry-After": String(seconds) },
+  });
+}
+
+async function handleAdminAuth(req, res) {
+  if (req.method === "GET") {
+    const session = readSession(req);
+    sendJson(res, 200, session.ok
+      ? { ok: true, authenticated: true, csrfToken: session.csrfToken, expiresAt: session.expiresAt }
+      : { ok: true, authenticated: false }, { admin: true });
+    return;
+  }
+
+  if (req.method === "POST") {
+    if (!authConfigured) {
+      logSecurityEvent("admin_auth_unconfigured", { client: requestFingerprint(req) });
+      sendJson(res, 503, { ok: false, message: "Administration is temporarily unavailable." }, { admin: true });
+      return;
+    }
+    if (!requireOrigin(req, res, { admin: true })) return;
+    const rate = loginLimiter.check(requestFingerprint(req));
+    if (!rate.allowed) {
+      logSecurityEvent("login_rate_limited", { client: requestFingerprint(req) });
+      rateLimitResponse(res, rate, { admin: true });
+      return;
+    }
+
+    const payload = await parseJsonBody(req, AUTH_BODY_LIMIT);
+    const fields = payload && typeof payload === "object" && !Array.isArray(payload) ? Object.keys(payload) : [];
+    if (fields.length !== 1 || fields[0] !== "password" || !verifyPassword(payload.password, adminPasswordHash)) {
+      logSecurityEvent("login_failed", { client: requestFingerprint(req) });
+      sendJson(res, 401, { ok: false, message: "Unable to sign in." }, { admin: true });
+      return;
+    }
+
+    const session = createSession({ secret: sessionSecret });
+    logSecurityEvent("login_succeeded", { client: requestFingerprint(req) });
+    sendJson(res, 200, {
+      ok: true,
+      authenticated: true,
+      csrfToken: session.csrfToken,
+      expiresAt: session.expiresAt,
+    }, {
+      admin: true,
+      headers: {
+        "Set-Cookie": createSessionCookie(session.token, {
+          secure: secureCookies,
+          maxAgeSeconds: Math.floor(DEFAULT_SESSION_TTL_MS / 1000),
+        }),
+      },
+    });
+    return;
+  }
+
+  if (req.method === "DELETE") {
+    if (!requireOrigin(req, res, { admin: true })) return;
+    if (!requireAdmin(req, res, { csrf: true })) return;
+    logSecurityEvent("logout", { client: requestFingerprint(req) });
+    sendJson(res, 200, { ok: true, authenticated: false }, {
+      admin: true,
+      headers: { "Set-Cookie": clearSessionCookie({ secure: secureCookies }) },
+    });
+    return;
+  }
+
+  sendJson(res, 405, { ok: false, message: "Method not allowed." }, { admin: true, headers: { Allow: "GET, POST, DELETE" } });
+}
+
+async function handleCarousel(req, res) {
+  if (req.method === "GET") {
+    sendJson(res, 200, { slides: getCarouselSlides(), posterSpecs });
+    return;
+  }
+  if (req.method !== "POST") {
+    sendJson(res, 405, { ok: false, message: "Method not allowed." }, { headers: { Allow: "GET, POST" } });
+    return;
+  }
+
+  if (!requireAdmin(req, res)) return;
+  if (!requireOrigin(req, res, { admin: true })) return;
+  if (!requireAdmin(req, res, { csrf: true })) return;
+  const payload = await parseJsonBody(req, CAROUSEL_BODY_LIMIT);
+  const validation = validateCarouselPayload(payload);
+  if (!validation.ok) {
+    sendJson(res, 400, { ok: false, message: validation.message }, { admin: true });
+    return;
+  }
+
+  const slides = saveCarouselSlides(validation.slides);
+  logSecurityEvent("carousel_saved", { client: requestFingerprint(req), slides: slides.length });
+  sendJson(res, 200, {
+    ok: true,
+    message: "Carousel posters saved securely. Push the data update to publish it on other hosts.",
+    slides,
+    posterSpecs,
+  }, { admin: true });
+}
+
+async function handleContact(req, res) {
+  if (req.method !== "POST") {
+    sendJson(res, 405, { ok: false, message: "Method not allowed." }, { headers: { Allow: "POST" } });
+    return;
+  }
+  if (!requireOrigin(req, res)) return;
+
+  const client = requestFingerprint(req);
+  const rate = contactLimiter.check(client);
+  if (!rate.allowed) {
+    logSecurityEvent("contact_rate_limited", { client });
+    rateLimitResponse(res, rate);
+    return;
+  }
+
+  const payload = await parseJsonBody(req, CONTACT_BODY_LIMIT);
+  const validation = validateContactPayload(payload);
+  if (!validation.ok) {
+    sendJson(res, 400, { ok: false, message: validation.message });
+    return;
+  }
+  const result = normalizeLead(validation.value);
+  logSecurityEvent("contact_accepted", { client, lead: result.lead?.id });
+  sendJson(res, 201, result);
+}
+
+function isPublicFile(pathname) {
+  return PUBLIC_FILES.has(pathname) || pathname.startsWith("/assets/");
+}
+
+function serveFile(req, res, pathname) {
+  if (!["GET", "HEAD"].includes(req.method)) {
+    sendText(res, 405, "Method not allowed.", { headers: { Allow: "GET, HEAD" } });
+    return;
+  }
+  const cleanPath = ROUTE_FILES.get(pathname) || pathname;
+  if (!isPublicFile(cleanPath)) {
+    sendText(res, 404, "Not found.", { admin: pathname.startsWith("/by-admin") });
+    return;
+  }
+  const filePath = resolvePublicPath(PUBLIC_ROOT, cleanPath);
+  if (!filePath) {
+    sendText(res, 404, "Not found.");
     return;
   }
 
   fs.readFile(filePath, (error, content) => {
     if (error) {
-      res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
-      res.end("Not found");
+      sendText(res, 404, "Not found.", { admin: cleanPath === "/by-admin.html" });
       return;
     }
-
     const ext = path.extname(filePath).toLowerCase();
-    res.writeHead(200, {
-      "Content-Type": mimeTypes[ext] || "application/octet-stream",
-      "Cache-Control": ext === ".html" ? "no-store" : "public, max-age=3600",
-    });
-    res.end(content);
+    const admin = cleanPath === "/by-admin.html" || cleanPath === "/admin.js";
+    applySecurityHeaders(res, { admin });
+    res.setHeader("Content-Type", mimeTypes[ext] || "application/octet-stream");
+    res.setHeader("Cache-Control", admin || ext === ".html" || ext === ".json"
+      ? "no-store, max-age=0"
+      : "public, max-age=3600");
+    res.writeHead(200);
+    res.end(req.method === "HEAD" ? undefined : content);
   });
 }
 
-const server = http.createServer(async (req, res) => {
-  const url = new URL(req.url, `http://${req.headers.host}`);
+async function handleRequest(req, res) {
+  let url;
+  try {
+    url = new URL(req.url, "http://localhost");
+  } catch {
+    sendJson(res, 400, { ok: false, message: "Invalid request." });
+    return;
+  }
 
   if (url.pathname === "/api/health") {
+    if (!["GET", "HEAD"].includes(req.method)) {
+      sendJson(res, 405, { ok: false, message: "Method not allowed." }, { headers: { Allow: "GET, HEAD" } });
+      return;
+    }
     sendJson(res, 200, { ok: true, service: "BizYako backend", timestamp: new Date().toISOString() });
     return;
   }
-
   if (url.pathname === "/api/site") {
-    sendJson(res, 200, {
-      brand: "bizYako",
-      tagline: "Your Business, Powered by AI.",
-      ...getSitePayload(),
-    });
-    return;
-  }
-
-
-  if (url.pathname === "/api/carousel") {
-    if (req.method === "GET") {
-      sendJson(res, 200, { slides: getCarouselSlides(), posterSpecs });
+    if (req.method !== "GET") {
+      sendJson(res, 405, { ok: false, message: "Method not allowed." }, { headers: { Allow: "GET" } });
       return;
     }
-
-    if (req.method === "POST") {
-      try {
-        const body = await collectBody(req);
-        const payload = JSON.parse(body || "{}");
-        const slides = saveCarouselSlides(payload.slides || []);
-        sendJson(res, 200, { ok: true, message: "Carousel posters saved locally. Push to GitHub/Vercel to publish.", slides, posterSpecs });
-      } catch (error) {
-        sendJson(res, 400, { ok: false, message: "Invalid carousel payload." });
-      }
-      return;
-    }
-
-    sendJson(res, 405, { ok: false, message: "Method not allowed." });
+    sendJson(res, 200, { brand: "bizYako", tagline: "Your Business, Powered by AI.", ...getSitePayload() });
     return;
   }
-
-  if (url.pathname === "/api/contact" && req.method === "POST") {
-    try {
-      const body = await collectBody(req);
-      const payload = JSON.parse(body || "{}");
-      const result = normalizeLead(payload);
-      sendJson(res, result.ok ? 201 : 400, result);
-    } catch (error) {
-      sendJson(res, 400, { ok: false, message: "Invalid request payload." });
-    }
-    return;
-  }
-
+  if (url.pathname === "/api/admin-auth") return handleAdminAuth(req, res);
+  if (url.pathname === "/api/carousel") return handleCarousel(req, res);
+  if (url.pathname === "/api/contact") return handleContact(req, res);
   if (url.pathname.startsWith("/api/")) {
     sendJson(res, 404, { ok: false, message: "API route not found." });
     return;
   }
+  serveFile(req, res, url.pathname);
+}
 
-  serveFile(res, url.pathname);
-});
+function createBizYakoServer() {
+  const server = http.createServer((req, res) => {
+    Promise.resolve(handleRequest(req, res)).catch((error) => {
+      const status = error instanceof HttpError ? error.status : 500;
+      if (status >= 500) logSecurityEvent("server_error", { route: req.url, client: requestFingerprint(req) });
+      sendJson(res, status, {
+        ok: false,
+        message: status === 413
+          ? "Request body is too large."
+          : status === 415
+            ? "Content-Type must be application/json."
+            : status >= 500
+              ? "The request could not be completed."
+              : "Invalid request payload.",
+      }, { admin: req.url?.startsWith("/api/admin-auth") || req.url?.startsWith("/api/carousel") });
+    });
+  });
+  server.requestTimeout = 15_000;
+  server.headersTimeout = 10_000;
+  server.keepAliveTimeout = 5_000;
+  return server;
+}
 
-server.listen(PORT, () => {
-  console.log(`BizYako frontend and backend running at http://localhost:${PORT}`);
-});
+if (require.main === module) {
+  const server = createBizYakoServer();
+  server.listen(PORT, "0.0.0.0", () => {
+    console.log(`BizYako frontend and backend running at http://localhost:${PORT}`);
+  });
+}
 
-
+module.exports = { createBizYakoServer };
