@@ -82,7 +82,7 @@ window.addEventListener("appinstalled", () => {
 
 let heroSlides = [
   {
-    image: "assets/bizyako-hero-vibrant.png",
+    image: "assets/bizyako-carousel-impact.png",
     kicker: "Your Business, Powered by AI.",
     status: "Unified suite live",
     title: "Business software that feels built for you.",
@@ -93,7 +93,7 @@ let heroSlides = [
     secondaryHref: "#contact",
   },
   {
-    image: "assets/bizyako-hero.png",
+    image: "assets/bizyako-carousel-growth.png",
     kicker: "Automation without the chaos",
     status: "AI workflows ready",
     title: "Turn repetitive operations into guided, intelligent workflows.",
@@ -105,7 +105,7 @@ let heroSlides = [
     product: "agents",
   },
   {
-    image: "assets/bizyako-hero-vibrant.png",
+    image: "assets/bizyako-carousel-wave.png",
     kicker: "Data that managers can act on",
     status: "Decision layer online",
     title: "From POS to ERP to analytics, your business finally speaks one language.",

@@ -1499,6 +1499,7 @@ body { background: #f6faf9; }
 .hero { min-height: 100svh; }
 .hero-art {
   opacity: 1;
+  object-position: center;
   filter: saturate(1.16) brightness(1.07) contrast(1.03);
   transform: scale(1.004);
   transition: opacity 440ms ease, transform 900ms cubic-bezier(.2,.75,.2,1), filter 440ms ease;
