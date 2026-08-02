@@ -1,12 +1,12 @@
 const CACHE_PREFIX = "bizyako-";
-const CACHE_NAME = "bizyako-shell-v9";
+const CACHE_NAME = "bizyako-shell-v10";
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=20260802-4",
-  "/script.js?v=20260802-4",
+  "/styles.css?v=20260802-5",
+  "/script.js?v=20260802-5",
   "/product-demo.html",
-  "/product-demo.js?v=20260802-4",
+  "/product-demo.js?v=20260802-5",
   "/manifest.webmanifest",
   "/data/site-static.json",
   "/assets/bizyako-logo.png",

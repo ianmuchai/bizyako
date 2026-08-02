@@ -33,6 +33,8 @@ test("hero posters remain visible behind localized glass surfaces", () => {
   const finalVisualSystem = styles.slice(styles.indexOf("/* 2026 wide visual system and support refinement */"));
 
   assert.match(finalVisualSystem, /\.hero-overlay\s*\{[^}]*rgba\(3, 12, 17, \.32\)[^}]*rgba\(3, 17, 22, \.04\)/s);
+  assert.match(finalVisualSystem, /\.hero-mainline\s*\{[^}]*rgba\(3, 18, 23, \.7\)[^}]*rgba\(3, 18, 23, \.52\)/s);
   assert.match(finalVisualSystem, /\.hero-mainline\s*\{[^}]*backdrop-filter:\s*blur\(20px\) saturate\(1\.2\)/s);
+  assert.match(finalVisualSystem, /\.hero-console\s*\{[^}]*rgba\(5, 25, 31, \.72\)[^}]*rgba\(6, 20, 28, \.58\)/s);
   assert.match(finalVisualSystem, /\.hero-transitioning \.hero-art\s*\{[^}]*opacity:\s*\.92/s);
 });
