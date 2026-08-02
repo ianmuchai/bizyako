@@ -40,15 +40,15 @@ test("public assets and shell cache are versioned for reliable updates", () => {
   const worker = fs.readFileSync(path.join(root, "service-worker.js"), "utf8");
   const publicFiles = [homepage, demo, admin, worker];
 
-  assert.match(homepage, /styles\.css\?v=20260802-3/);
-  assert.match(homepage, /script\.js\?v=20260802-3/);
-  assert.match(demo, /styles\.css\?v=20260802-3/);
-  assert.match(demo, /product-demo\.js\?v=20260802-3/);
-  assert.match(admin, /styles\.css\?v=20260802-3/);
-  assert.match(admin, /admin\.js\?v=20260802-3/);
-  assert.match(worker, /bizyako-shell-v8/);
-  assert.match(worker, /20260802-3/);
+  assert.match(homepage, /styles\.css\?v=20260802-4/);
+  assert.match(homepage, /script\.js\?v=20260802-4/);
+  assert.match(demo, /styles\.css\?v=20260802-4/);
+  assert.match(demo, /product-demo\.js\?v=20260802-4/);
+  assert.match(admin, /styles\.css\?v=20260802-4/);
+  assert.match(admin, /admin\.js\?v=20260802-4/);
+  assert.match(worker, /bizyako-shell-v9/);
+  assert.match(worker, /20260802-4/);
   publicFiles.forEach((source) => {
-    assert.doesNotMatch(source, /bizyako-shell-v7|20260802-2|bizyako-shell-v6|20260802-1|bizyako-shell-v5|20260731-2/);
+    assert.doesNotMatch(source, /bizyako-shell-v8|20260802-3|bizyako-shell-v7|20260802-2|bizyako-shell-v6|20260802-1|bizyako-shell-v5|20260731-2/);
   });
 });

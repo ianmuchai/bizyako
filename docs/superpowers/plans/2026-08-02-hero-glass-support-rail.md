@@ -23,7 +23,7 @@
 ### Task 1: Hero Poster Visibility and Glass Surfaces
 
 **Files:**
-- Modify: `tests/responsive-layout.test.js`
+- Modify: `tests/responsive-ui.test.js`
 - Modify: `styles.css`
 
 **Interfaces:**
@@ -47,7 +47,7 @@ test("hero posters remain visible behind localized glass surfaces", () => {
 
 - [ ] **Step 2: Run the focused test and confirm failure**
 
-Run: `node --test tests/responsive-layout.test.js`
+Run: `node --test tests/responsive-ui.test.js`
 
 Expected: FAIL because the current final overlay starts at `.84` and the transition image opacity is `.82`.
 
@@ -78,7 +78,7 @@ Add a narrow-viewport `.hero-mainline` tint of approximately `.54` without incre
 
 - [ ] **Step 4: Run the focused test and confirm pass**
 
-Run: `node --test tests/responsive-layout.test.js`
+Run: `node --test tests/responsive-ui.test.js`
 
 Expected: PASS.
 
@@ -195,7 +195,7 @@ Start the local server, inspect `1440x900` and `390x844`, and confirm:
 - [ ] **Step 6: Commit and push**
 
 ```powershell
-git add index.html product-demo.html by-admin.html service-worker.js styles.css tests/responsive-layout.test.js tests/support-ui.test.js tests/pwa.test.js
+git add index.html product-demo.html by-admin.html service-worker.js styles.css tests/responsive-ui.test.js tests/support-ui.test.js tests/pwa.test.js docs/superpowers/plans/2026-08-02-hero-glass-support-rail.md
 git commit -m "fix: refine hero glass and support controls"
 git push origin main
 ```

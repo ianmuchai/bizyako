@@ -28,3 +28,11 @@ test("contact section uses a crisp divider without an overlapping transition lay
   assert.match(finalVisualSystem, /\.contact-section\s*\{[^}]*border-top:\s*2px solid #08b893;/s);
   assert.doesNotMatch(finalVisualSystem, /\.contact-section::before\s*\{/);
 });
+
+test("hero posters remain visible behind localized glass surfaces", () => {
+  const finalVisualSystem = styles.slice(styles.indexOf("/* 2026 wide visual system and support refinement */"));
+
+  assert.match(finalVisualSystem, /\.hero-overlay\s*\{[^}]*rgba\(3, 12, 17, \.32\)[^}]*rgba\(3, 17, 22, \.04\)/s);
+  assert.match(finalVisualSystem, /\.hero-mainline\s*\{[^}]*backdrop-filter:\s*blur\(20px\) saturate\(1\.2\)/s);
+  assert.match(finalVisualSystem, /\.hero-transitioning \.hero-art\s*\{[^}]*opacity:\s*\.92/s);
+});
