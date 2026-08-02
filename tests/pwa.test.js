@@ -36,9 +36,19 @@ test("public pages link the manifest and register the service worker externally"
 test("public assets and shell cache are versioned for reliable updates", () => {
   const homepage = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const demo = fs.readFileSync(path.join(root, "product-demo.html"), "utf8");
+  const admin = fs.readFileSync(path.join(root, "by-admin.html"), "utf8");
   const worker = fs.readFileSync(path.join(root, "service-worker.js"), "utf8");
-  assert.match(homepage, /styles\.css\?v=20260731-2/);
-  assert.match(homepage, /script\.js\?v=20260731/);
-  assert.match(demo, /styles\.css\?v=20260731-2/);
-  assert.match(worker, /bizyako-shell-v5/);
+  const publicFiles = [homepage, demo, admin, worker];
+
+  assert.match(homepage, /styles\.css\?v=20260802-1/);
+  assert.match(homepage, /script\.js\?v=20260802-1/);
+  assert.match(demo, /styles\.css\?v=20260802-1/);
+  assert.match(demo, /product-demo\.js\?v=20260802-1/);
+  assert.match(admin, /styles\.css\?v=20260802-1/);
+  assert.match(admin, /admin\.js\?v=20260802-1/);
+  assert.match(worker, /bizyako-shell-v6/);
+  assert.match(worker, /20260802-1/);
+  publicFiles.forEach((source) => {
+    assert.doesNotMatch(source, /bizyako-shell-v5|20260731-2/);
+  });
 });

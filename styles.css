@@ -1629,19 +1629,11 @@ body { background: #f6faf9; }
   position: relative;
   isolation: isolate;
   overflow: clip;
+  border-top: 2px solid #08b893;
 }
 .contact-section > * {
   position: relative;
   z-index: 1;
-}
-.contact-section::before {
-  position: absolute;
-  inset: 0 0 auto;
-  z-index: 0;
-  height: 48px;
-  pointer-events: none;
-  content: '';
-  background: linear-gradient(180deg, #eaf4fa 0%, rgba(57, 89, 101, .72) 56%, #06131b 100%);
 }
 .site-footer { width: 100%; }
 .footer-grid,
@@ -1799,10 +1791,6 @@ body { background: #f6faf9; }
   .support-hub { right: 12px; bottom: 12px; }
   .support-action { width: 50px; height: 50px; }
   .support-action svg { width: 30px; height: 30px; }
-  .contact-section::before {
-    inset: 0 0 auto;
-    height: 32px;
-  }
   .chat-panel {
     right: 12px;
     bottom: 72px;
