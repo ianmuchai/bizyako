@@ -1650,37 +1650,51 @@ body { background: #f6faf9; }
 .demo-page-copy h1 { font-size: 3.6rem; line-height: 1.06; }
 .demo-page-cta h2 { font-size: 2.8rem; line-height: 1.08; }
 
-.support-hub { right: 18px; bottom: 18px; gap: 9px; }
+.support-hub { right: 18px; bottom: 18px; gap: 10px; }
 .support-action {
   position: relative;
   width: 54px;
   height: 54px;
+  display: inline-grid;
+  place-items: center;
   overflow: visible;
   border: 0;
   border-radius: 0;
+  color: #fff;
   background: transparent;
   box-shadow: none;
   backdrop-filter: none;
+  cursor: pointer;
 }
 .support-action:hover,
 .support-action.active {
-  transform: translateY(-2px) scale(1.03);
+  transform: none;
   box-shadow: none;
 }
-.whatsapp-action { color: #20c764; background: transparent; }
-.chat-action { color: #17a7c5; background: transparent; }
+.whatsapp-action { color: #25d366; background: transparent; }
+.chat-action { color: #12a9c2; background: transparent; }
 .whatsapp-action::before,
 .chat-action::before { display: none; }
 .support-action svg {
-  width: 32px;
-  height: 32px;
-  filter: drop-shadow(0 0 1px rgba(255, 255, 255, .95)) drop-shadow(0 3px 8px rgba(1, 10, 15, .66));
+  width: 40px;
+  height: 40px;
+  display: block;
+  overflow: visible;
+  transform-origin: center;
+  filter: drop-shadow(0 5px 10px rgba(1, 10, 15, .28));
+  transition: transform 180ms ease, filter 180ms ease;
+  will-change: transform;
 }
-.support-action svg path[stroke] {
-  stroke-width: 2.65;
+.support-action:hover svg,
+.support-action.active svg {
+  transform: translateY(-2px) scale(1.06);
+  filter: drop-shadow(0 7px 13px rgba(1, 10, 15, .34));
 }
+.launcher-bubble { vector-effect: non-scaling-stroke; }
+.launcher-detail,
+.chat-dot { fill: #fff; }
 .support-action:focus-visible {
-  outline: 2px solid rgba(8, 184, 147, .8);
+  outline: 2px solid rgba(8, 184, 147, .9);
   outline-offset: 2px;
   box-shadow: none;
 }
@@ -1693,8 +1707,17 @@ body { background: #f6faf9; }
 .chat-dot:nth-of-type(3) { animation-delay: .3s; }
 .chat-action.active .chat-dot { animation-play-state: paused; opacity: 1; transform: none; }
 @keyframes chatDot {
-  0%, 60%, 100% { opacity: .52; transform: translateY(0); }
+  0%, 60%, 100% { opacity: .68; transform: translateY(0); }
   30% { opacity: 1; transform: translateY(-2px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .support-action svg,
+  .chat-dot {
+    animation: none;
+    transition: none;
+  }
+  .support-action:hover svg,
+  .support-action.active svg { transform: none; }
 }
 .chat-panel {
   right: 84px;
@@ -1790,7 +1813,7 @@ body { background: #f6faf9; }
   .footer-bottom { width: calc(100% - 36px); }
   .support-hub { right: 12px; bottom: 12px; }
   .support-action { width: 50px; height: 50px; }
-  .support-action svg { width: 30px; height: 30px; }
+  .support-action svg { width: 38px; height: 38px; }
   .chat-panel {
     right: 12px;
     bottom: 72px;
