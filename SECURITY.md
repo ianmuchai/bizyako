@@ -40,6 +40,21 @@ Open **Setup Node.js App**, select the BizYako application, and add the same thr
 
 Use cPanel permissions appropriate for the account: directories `0755`, public files `0644`, and owner-only temporary credential files `0600`. Remove deployment ZIPs from the public application directory after extraction and verification.
 
+## Infrastructure fingerprinting
+
+The cPanel `.htaccess` removes `Server`, `X-Powered-By`, `X-Turbo-Charged-By`, and LiteSpeed cache headers where the hosting layer permits overrides. After every cPanel deployment, inspect the live response headers. If `Server: LiteSpeed` or `X-Turbo-Charged-By: LiteSpeed` remains, ask Namecheap support to enable LiteSpeed **Hide Full Header** for `bizyako.com`; a shared-hosting server can add these headers after the application has responded.
+
+Header removal does not conceal an origin IP published in public DNS. To obscure the current Namecheap web origin:
+
+1. Move authoritative DNS to Cloudflare and enable proxied DNS for the apex and `www` web records.
+2. Use **Full (strict)** SSL/TLS mode and retain a valid certificate on the Namecheap origin.
+3. Review DNS-only `mail`, `ftp`, `cpanel`, `webmail`, `webdisk`, `autodiscover`, and `autoconfig` records. Move non-web services to provider hostnames or a separate IP where possible so they do not disclose the web origin IP.
+4. After Cloudflare is active, ask Namecheap to rotate the origin IP. Historical DNS services may retain the old address, so proxying without rotation is incomplete.
+5. If the hosting plan permits it, restrict origin HTTP/HTTPS access to Cloudflare IP ranges and trusted administrator access.
+6. Recheck public DNS, response headers, certificate behavior, email delivery, and both apex and `www` after the change.
+
+Infrastructure details cannot be guaranteed private while direct or related DNS records point to the same shared-hosting IP. Historical DNS records held by third parties also cannot be deleted by an application code change.
+
 ## Password and secret rotation
 
 Perform rotation immediately after suspected disclosure and routinely after administrator changes.

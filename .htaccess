@@ -18,7 +18,22 @@ ServerSignature Off
 </FilesMatch>
 
 <IfModule mod_headers.c>
+  Header unset Server
+  Header always unset Server
+  Header unset X-Powered-By
   Header always unset X-Powered-By
+  Header unset X-Turbo-Charged-By
+  Header always unset X-Turbo-Charged-By
+  Header unset X-LiteSpeed-Cache
+  Header always unset X-LiteSpeed-Cache
+  Header unset X-LiteSpeed-Cache-Control
+  Header always unset X-LiteSpeed-Cache-Control
+  Header unset X-LiteSpeed-Purge
+  Header always unset X-LiteSpeed-Purge
+  Header unset X-LiteSpeed-Tag
+  Header always unset X-LiteSpeed-Tag
+  Header unset X-LSCACHE
+  Header always unset X-LSCACHE
   Header always set Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://wa.me https://api.whatsapp.com; manifest-src 'self'; worker-src 'self'; frame-src 'none'; upgrade-insecure-requests"
   Header always set Cross-Origin-Opener-Policy "same-origin"
   Header always set Cross-Origin-Resource-Policy "same-origin"

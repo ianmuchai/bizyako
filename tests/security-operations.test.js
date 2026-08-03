@@ -45,6 +45,10 @@ test("the owner runbook covers setup, rotation, lockout, hosting, firewall, and 
     "log-only",
     "recovery",
     "cPanel",
+    "origin IP",
+    "proxied DNS",
+    "historical DNS",
+    "X-Turbo-Charged-By",
     "Vercel",
   ]) {
     assert.match(policy, new RegExp(requirement, "i"));
@@ -102,4 +106,10 @@ test("cPanel rejects private source paths before the Node runtime", () => {
   assert.match(apache, /RewriteRule \^api\/\.\*\\\.js\$/);
   assert.match(apache, /SECURITY\\\.md/);
   assert.match(apache, /app\\\.js/);
+  assert.match(apache, /Header always unset Server/);
+  assert.match(apache, /Header unset Server/);
+  assert.match(apache, /Header always unset X-Turbo-Charged-By/);
+  assert.match(apache, /Header unset X-Turbo-Charged-By/);
+  assert.match(apache, /Header always unset X-Powered-By/);
+  assert.match(apache, /Header always unset X-LiteSpeed-Cache/);
 });
