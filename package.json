@@ -4,7 +4,7 @@
   "private": true,
   "description": "BizYako full-stack business technology website",
   "scripts": {
-    "start": "node server.js",
+    "start": "node app.js",
     "dev": "node server.js",
     "build": "node scripts/build-vercel-static.js",
     "test": "node --test tests/*.test.js",

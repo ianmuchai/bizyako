@@ -36,7 +36,7 @@ Do not expose them with a public prefix. Vercel carousel writes remain intention
 
 ### Namecheap cPanel
 
-Open **Setup Node.js App**, select the BizYako application, and add the same three values under **Environment variables**. Keep the application in Production mode, use `server.js` as the startup file, save, and restart the app. Do not place a `.env` file under `public_html` or another web-accessible directory.
+Open **Setup Node.js App**, select the BizYako application, and add the same three values under **Environment variables**. Keep the application in Production mode, use `app.js` as the startup file, save, and restart the app. Do not place a `.env` file under `public_html` or another web-accessible directory.
 
 Use cPanel permissions appropriate for the account: directories `0755`, public files `0644`, and owner-only temporary credential files `0600`. Remove deployment ZIPs from the public application directory after extraction and verification.
 

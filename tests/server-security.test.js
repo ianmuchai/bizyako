@@ -51,6 +51,32 @@ const contactPayload = (overrides = {}) => ({
   ...overrides,
 });
 
+test("Passenger startup entry listens when loaded through a module loader", async (t) => {
+  const port = await getFreePort();
+  const baseUrl = "http://127.0.0.1:" + port;
+  const child = spawn(process.execPath, ["-e", "require('./app.js')"], {
+    cwd: root,
+    env: {
+      ...process.env,
+      PORT: String(port),
+      NODE_ENV: "production",
+      BIZYAKO_ALLOWED_ORIGINS: baseUrl,
+    },
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+
+  t.after(async () => {
+    if (child.exitCode === null) {
+      child.kill();
+      await new Promise((resolve) => child.once("exit", resolve));
+    }
+  });
+
+  await waitForServer(baseUrl, child);
+  const response = await fetch(baseUrl + "/api/health");
+  assert.equal(response.status, 200);
+});
+
 test("Node runtime enforces the BizYako security boundary end to end", async (t) => {
   const port = await getFreePort();
   const baseUrl = `http://127.0.0.1:${port}`;
@@ -97,6 +123,7 @@ test("Node runtime enforces the BizYako security boundary end to end", async (t)
     assert.match(admin.headers.get("x-robots-tag"), /noindex/);
 
     assert.equal((await fetch(`${baseUrl}/server.js`)).status, 404);
+    assert.equal((await fetch(baseUrl + "/app.js")).status, 404);
     assert.equal((await fetch(`${baseUrl}/%252e%252e%252fserver.js`)).status, 404);
   });
 

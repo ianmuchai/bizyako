@@ -49,6 +49,7 @@ test("the owner runbook covers setup, rotation, lockout, hosting, firewall, and 
   ]) {
     assert.match(policy, new RegExp(requirement, "i"));
   }
+  assert.match(policy, /use .*app\.js.*startup file/i);
   assert.match(read(".gitignore"), /BIZYAKO_SECURITY_SETUP\.txt/);
 });
 
@@ -87,7 +88,7 @@ test("Vercel publishes only the approved static surface", () => {
     ]) {
       assert.equal(fs.existsSync(path.join(output, publicFile)), true, `expected public output ${publicFile}`);
     }
-    for (const privatePath of ["server.js", "SECURITY.md", "lib", "scripts", "tests", path.join("data", "siteData.js"), path.join("data", "carouselSlides.json")]) {
+    for (const privatePath of ["app.js", "server.js", "SECURITY.md", "lib", "scripts", "tests", path.join("data", "siteData.js"), path.join("data", "carouselSlides.json")]) {
       assert.equal(fs.existsSync(path.join(output, privatePath)), false, `did not expect private output ${privatePath}`);
     }
   } finally {
@@ -100,4 +101,5 @@ test("cPanel rejects private source paths before the Node runtime", () => {
   assert.match(apache, /RewriteRule \^data\/\(\?!site-static\\\.json\$\)/);
   assert.match(apache, /RewriteRule \^api\/\.\*\\\.js\$/);
   assert.match(apache, /SECURITY\\\.md/);
+  assert.match(apache, /app\\\.js/);
 });

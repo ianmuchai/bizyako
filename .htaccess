@@ -13,7 +13,7 @@ ServerSignature Off
   RewriteRule ^by-admin/?$ by-admin.html [L,QSA]
 </IfModule>
 
-<FilesMatch "^(server\.js|package(?:-lock)?\.json|vercel\.json|README\.md|SECURITY\.md|\.gitignore|\.vercelignore)$">
+<FilesMatch "^(app\.js|server\.js|package(?:-lock)?\.json|vercel\.json|README\.md|SECURITY\.md|\.gitignore|\.vercelignore)$">
   Require all denied
 </FilesMatch>
 

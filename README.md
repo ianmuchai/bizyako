@@ -6,6 +6,7 @@ BizYako is a modern business technology website for CRM, ERP, POS, analytics, IS
 
 - Static frontend: `index.html`, `styles.css`, `script.js`
 - Local backend: `server.js`
+- cPanel Passenger entry: `app.js`
 - Vercel backend: serverless API routes in `api/`
 - Shared API data: `data/siteData.js`
 
@@ -42,6 +43,7 @@ Vercel will serve the frontend files and automatically deploy the serverless fun
 
 ```text
 assets/              Exact BizYako logo photo and hero image assets
+app.js               cPanel Passenger startup entry
 api/                 Vercel serverless API routes
 data/                Shared site/product data
 index.html           Frontend markup
