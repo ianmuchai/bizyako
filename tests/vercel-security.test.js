@@ -61,11 +61,20 @@ test("Vercel handlers enforce auth, validation, throttling, and headers", async 
     passwordHash: process.env.BIZYAKO_ADMIN_PASSWORD_HASH,
     sessionSecret: process.env.BIZYAKO_SESSION_SECRET,
     origins: process.env.BIZYAKO_ALLOWED_ORIGINS,
+    siliconFlowKey: process.env.SILICONFLOW_API_KEY,
+    siliconFlowBaseUrl: process.env.SILICONFLOW_BASE_URL,
+    siliconFlowModel: process.env.SILICONFLOW_MODEL,
+    siliconFlowModel2: process.env.SILICONFLOW_MODEL_2,
   };
+  const originalFetch = global.fetch;
   const password = "Vercel-Integration-Password";
   process.env.BIZYAKO_ADMIN_PASSWORD_HASH = hashPassword(password, Buffer.alloc(16, 4));
   process.env.BIZYAKO_SESSION_SECRET = "vercel-integration-session-secret-32-bytes";
   process.env.BIZYAKO_ALLOWED_ORIGINS = "https://bizyako.com,https://bizyako.vercel.app";
+  process.env.SILICONFLOW_API_KEY = "test-provider-credential";
+  process.env.SILICONFLOW_BASE_URL = "https://api.siliconflow.com/v1";
+  process.env.SILICONFLOW_MODEL = "openai/gpt-oss-120b";
+  process.env.SILICONFLOW_MODEL_2 = "google/gemma-4-31B-it";
   t.after(() => {
     if (originalEnvironment.passwordHash === undefined) delete process.env.BIZYAKO_ADMIN_PASSWORD_HASH;
     else process.env.BIZYAKO_ADMIN_PASSWORD_HASH = originalEnvironment.passwordHash;
@@ -73,10 +82,20 @@ test("Vercel handlers enforce auth, validation, throttling, and headers", async 
     else process.env.BIZYAKO_SESSION_SECRET = originalEnvironment.sessionSecret;
     if (originalEnvironment.origins === undefined) delete process.env.BIZYAKO_ALLOWED_ORIGINS;
     else process.env.BIZYAKO_ALLOWED_ORIGINS = originalEnvironment.origins;
+    if (originalEnvironment.siliconFlowKey === undefined) delete process.env.SILICONFLOW_API_KEY;
+    else process.env.SILICONFLOW_API_KEY = originalEnvironment.siliconFlowKey;
+    if (originalEnvironment.siliconFlowBaseUrl === undefined) delete process.env.SILICONFLOW_BASE_URL;
+    else process.env.SILICONFLOW_BASE_URL = originalEnvironment.siliconFlowBaseUrl;
+    if (originalEnvironment.siliconFlowModel === undefined) delete process.env.SILICONFLOW_MODEL;
+    else process.env.SILICONFLOW_MODEL = originalEnvironment.siliconFlowModel;
+    if (originalEnvironment.siliconFlowModel2 === undefined) delete process.env.SILICONFLOW_MODEL_2;
+    else process.env.SILICONFLOW_MODEL_2 = originalEnvironment.siliconFlowModel2;
+    global.fetch = originalFetch;
   });
 
   const adminAuth = require("../api/admin-auth");
   const carousel = require("../api/carousel");
+  const chat = require("../api/chat");
   const contact = require("../api/contact");
   const health = require("../api/health");
 
@@ -154,6 +173,75 @@ test("Vercel handlers enforce auth, validation, throttling, and headers", async 
       assert.equal(allowed.statusCode, 201);
     }
     const limited = await invoke(contact, request("POST", { body: validContact(), ip: "203.0.113.62" }));
+    assert.equal(limited.statusCode, 429);
+    assert.ok(Number(limited.getHeader("retry-after")) >= 1);
+  });
+
+  await t.test("chat handler proxies safe advisor requests without exposing provider details", async () => {
+    const providerCalls = [];
+    global.fetch = async (url, options) => {
+      providerCalls.push({ url, options });
+      return new Response(JSON.stringify({
+        choices: [{ message: { content: "A phased ERP rollout can connect inventory, finance, and approvals." } }],
+      }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    };
+
+    const wrongMethod = await invoke(chat, request("GET"));
+    assert.equal(wrongMethod.statusCode, 405);
+
+    const wrongOrigin = await invoke(chat, request("POST", {
+      origin: "https://bizyako.com.evil.example",
+      body: { messages: [{ role: "user", content: "Help with ERP." }] },
+    }));
+    assert.equal(wrongOrigin.statusCode, 403);
+
+    const wrongType = await invoke(chat, request("POST", {
+      body: { messages: [{ role: "user", content: "Help with ERP." }] },
+      contentType: "text/plain",
+    }));
+    assert.equal(wrongType.statusCode, 415);
+
+    const valid = await invoke(chat, request("POST", {
+      body: { messages: [{ role: "user", content: "Help with ERP." }] },
+      ip: "203.0.113.70",
+    }));
+    assert.equal(valid.statusCode, 200);
+    assert.deepEqual(valid.payload, {
+      ok: true,
+      reply: "A phased ERP rollout can connect inventory, finance, and approvals.",
+      model: "openai/gpt-oss-120b",
+      fallback: false,
+    });
+    assert.match(valid.getHeader("cache-control"), /no-store/);
+    assert.equal(providerCalls.length, 1);
+
+    const key = process.env.SILICONFLOW_API_KEY;
+    delete process.env.SILICONFLOW_API_KEY;
+    const unavailable = await invoke(chat, request("POST", {
+      body: { messages: [{ role: "user", content: "Help with CRM." }] },
+      ip: "203.0.113.71",
+    }));
+    process.env.SILICONFLOW_API_KEY = key;
+    assert.equal(unavailable.statusCode, 503);
+    assert.deepEqual(unavailable.payload, {
+      ok: false,
+      message: "The BizYako advisor is temporarily unavailable. Please try again shortly.",
+    });
+
+    for (let index = 0; index < 12; index += 1) {
+      const allowed = await invoke(chat, request("POST", {
+        body: { messages: [{ role: "user", content: `Advisor question ${index}` }] },
+        ip: "203.0.113.72",
+      }));
+      assert.equal(allowed.statusCode, 200);
+    }
+    const limited = await invoke(chat, request("POST", {
+      body: { messages: [{ role: "user", content: "One more question" }] },
+      ip: "203.0.113.72",
+    }));
     assert.equal(limited.statusCode, 429);
     assert.ok(Number(limited.getHeader("retry-after")) >= 1);
   });

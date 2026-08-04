@@ -25,11 +25,13 @@ const {
   verifySession,
 } = require("./lib/security");
 const { getSitePayload, normalizeLead, getCarouselSlides, posterSpecs, saveCarouselSlides } = require("./data/siteData");
+const { AdvisorError, requestAdvisorReply, validateChatPayload } = require("./lib/advisor");
 
 const PORT = Number(process.env.PORT) || 5173;
 const PUBLIC_ROOT = __dirname;
 const IS_PRODUCTION = process.env.NODE_ENV === "production";
 const CONTACT_BODY_LIMIT = 32 * 1024;
+const CHAT_BODY_LIMIT = 16 * 1024;
 const CAROUSEL_BODY_LIMIT = 8 * 1024 * 1024;
 const AUTH_BODY_LIMIT = 4 * 1024;
 const PUBLIC_FILES = new Set([
@@ -81,6 +83,8 @@ const authConfigured = /^scrypt\$v1\$[A-Za-z0-9_-]+\$[A-Za-z0-9_-]+$/.test(admin
   && allowedOrigins.length > 0;
 const loginLimiter = createRateLimiter({ limit: 5, windowMs: 15 * 60 * 1000 });
 const contactLimiter = createRateLimiter({ limit: 6, windowMs: 10 * 60 * 1000 });
+const chatLimiter = createRateLimiter({ limit: 12, windowMs: 10 * 60 * 1000 });
+const chatInFlight = new Set();
 
 class HttpError extends Error {
   constructor(status, message) {
@@ -335,6 +339,75 @@ async function handleContact(req, res) {
   sendJson(res, 201, result);
 }
 
+function advisorDurationBucket(startedAt) {
+  const elapsed = Date.now() - startedAt;
+  if (elapsed < 1_000) return "under_1s";
+  if (elapsed < 5_000) return "1_to_5s";
+  if (elapsed < 10_000) return "5_to_10s";
+  return "over_10s";
+}
+
+async function handleChat(req, res) {
+  if (req.method !== "POST") {
+    sendJson(res, 405, { ok: false, message: "Method not allowed." }, { headers: { Allow: "POST" } });
+    return;
+  }
+  if (!requireOrigin(req, res)) return;
+
+  const client = requestFingerprint(req);
+  const rate = chatLimiter.check(client);
+  if (!rate.allowed) {
+    logSecurityEvent("advisor_rate_limited", { client });
+    rateLimitResponse(res, rate);
+    return;
+  }
+  if (chatInFlight.has(client)) {
+    logSecurityEvent("advisor_concurrent_request_rejected", { client });
+    sendJson(res, 429, { ok: false, message: "Please wait for the current reply." }, {
+      headers: { "Retry-After": "1" },
+    });
+    return;
+  }
+
+  const payload = await parseJsonBody(req, CHAT_BODY_LIMIT);
+  const validation = validateChatPayload(payload);
+  if (!validation.ok) {
+    sendJson(res, 400, { ok: false, message: validation.message });
+    return;
+  }
+
+  const startedAt = Date.now();
+  chatInFlight.add(client);
+  try {
+    const result = await requestAdvisorReply(validation.messages);
+    logSecurityEvent("advisor_reply_completed", {
+      client,
+      model: result.model,
+      fallback: result.fallback,
+      duration: advisorDurationBucket(startedAt),
+    });
+    sendJson(res, 200, { ok: true, ...result });
+  } catch (error) {
+    const providerLimited = error instanceof AdvisorError && error.status === 429;
+    logSecurityEvent(providerLimited ? "advisor_provider_rate_limited" : "advisor_reply_failed", {
+      client,
+      duration: advisorDurationBucket(startedAt),
+    });
+    if (providerLimited) {
+      sendJson(res, 429, { ok: false, message: "The advisor is busy. Please try again shortly." }, {
+        headers: { "Retry-After": "30" },
+      });
+      return;
+    }
+    sendJson(res, 503, {
+      ok: false,
+      message: "The BizYako advisor is temporarily unavailable. Please try again shortly.",
+    });
+  } finally {
+    chatInFlight.delete(client);
+  }
+}
+
 function isPublicFile(pathname) {
   return PUBLIC_FILES.has(pathname) || pathname.startsWith("/assets/");
 }
@@ -400,6 +473,7 @@ async function handleRequest(req, res) {
   if (url.pathname === "/api/admin-auth") return handleAdminAuth(req, res);
   if (url.pathname === "/api/carousel") return handleCarousel(req, res);
   if (url.pathname === "/api/contact") return handleContact(req, res);
+  if (url.pathname === "/api/chat") return handleChat(req, res);
   if (url.pathname.startsWith("/api/")) {
     sendJson(res, 404, { ok: false, message: "API route not found." });
     return;
