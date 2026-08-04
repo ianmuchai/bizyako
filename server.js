@@ -40,6 +40,7 @@ const PUBLIC_FILES = new Set([
   "/by-admin.html",
   "/styles.css",
   "/script.js",
+  "/chat-history.js",
   "/product-demo.js",
   "/admin.js",
   "/manifest.webmanifest",

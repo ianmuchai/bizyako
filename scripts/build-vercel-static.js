@@ -9,6 +9,7 @@ const publicFiles = [
   "product-demo.html",
   "styles.css",
   "script.js",
+  "chat-history.js",
   "admin.js",
   "product-demo.js",
   "service-worker.js",
