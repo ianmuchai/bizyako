@@ -101,6 +101,10 @@ test("the primary model receives redacted messages and returns bounded plain tex
   assert.equal(calls[0].options.headers.Authorization, "Bearer test-provider-credential");
   assert.equal(calls[0].body.model, "openai/gpt-oss-120b");
   assert.match(calls[0].body.messages[0].content, /BizYako/);
+  assert.match(calls[0].body.messages[0].content, /natural, adaptive conversation/i);
+  assert.match(calls[0].body.messages[0].content, /use prior turns/i);
+  assert.match(calls[0].body.messages[0].content, /one purposeful discovery question at a time/i);
+  assert.match(calls[0].body.messages[0].content, /do not default to headings, numbered lists, or feature dumps/i);
   assert.match(calls[0].body.messages.at(-1).content, /\[phone redacted\]/);
   assert.doesNotMatch(JSON.stringify(calls[0].body), /0754959895/);
   assert.doesNotMatch(JSON.stringify(result), /provider-secret-chain-of-thought/);

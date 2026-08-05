@@ -5,6 +5,7 @@ const path = require("node:path");
 const {
   createRateLimiter,
   getSecurityHeaders,
+  resolveAllowedOrigins,
   resolvePublicPath,
   validateOrigin,
 } = require("../lib/security/http");
@@ -20,6 +21,25 @@ test("origin validation only permits exact configured origins", () => {
   assert.equal(validateOrigin(null, allowed), false);
 });
 
+test("production origin resolution always permits canonical BizYako hosts", () => {
+  const resolved = resolveAllowedOrigins("https://bizyako.vercel.app,https://bizyako.com.evil.example", {
+    production: true,
+  });
+
+  assert.deepEqual(resolved, [
+    "https://bizyako.com",
+    "https://www.bizyako.com",
+    "https://bizyako.vercel.app",
+    "https://bizyako.com.evil.example",
+  ]);
+  assert.equal(validateOrigin("https://bizyako.com", resolved), true);
+  assert.equal(validateOrigin("https://www.bizyako.com", resolved), true);
+  assert.equal(validateOrigin("https://bizyako.com.evil.example", ["https://bizyako.com"]), false);
+  assert.deepEqual(resolveAllowedOrigins("", {
+    production: false,
+    developmentOrigins: ["http://localhost:4000"],
+  }), ["http://localhost:4000"]);
+});
 test("rate limiter blocks a key until its fixed window resets", () => {
   let clock = 10_000;
   const limiter = createRateLimiter({ limit: 2, windowMs: 1_000, now: () => clock });

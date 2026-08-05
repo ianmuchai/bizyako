@@ -17,6 +17,7 @@ const {
   getSecurityHeaders,
   logSecurityEvent,
   parseCookies,
+  resolveAllowedOrigins,
   resolvePublicPath,
   validateCarouselPayload,
   validateContactPayload,
@@ -70,12 +71,11 @@ const mimeTypes = {
   ".txt": "text/plain; charset=utf-8",
 };
 
-const configuredOrigins = String(process.env.BIZYAKO_ALLOWED_ORIGINS || "")
-  .split(",")
-  .map((value) => value.trim())
-  .filter(Boolean);
 const developmentOrigins = [`http://localhost:${PORT}`, `http://127.0.0.1:${PORT}`];
-const allowedOrigins = configuredOrigins.length ? configuredOrigins : IS_PRODUCTION ? [] : developmentOrigins;
+const allowedOrigins = resolveAllowedOrigins(process.env.BIZYAKO_ALLOWED_ORIGINS, {
+  production: IS_PRODUCTION,
+  developmentOrigins,
+});
 const adminPasswordHash = process.env.BIZYAKO_ADMIN_PASSWORD_HASH || "";
 const sessionSecret = process.env.BIZYAKO_SESSION_SECRET || "";
 const secureCookies = IS_PRODUCTION && process.env.BIZYAKO_FORCE_SECURE_COOKIE !== "false";
