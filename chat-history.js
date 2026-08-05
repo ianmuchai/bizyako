@@ -1,10 +1,10 @@
 "use strict";
 
 (function exposeChatHistory(root, factory) {
-  const api = factory();
+  const api = factory(root);
   if (typeof module === "object" && module.exports) module.exports = api;
   if (root) root.BizYakoChatHistory = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function createModule() {
+})(typeof globalThis !== "undefined" ? globalThis : this, function createModule(root) {
   const STORAGE_KEY = "bizyako.advisor.history.v1";
   const RETENTION_MS = 30 * 24 * 60 * 60 * 1000;
   const MAX_MESSAGES = 40;

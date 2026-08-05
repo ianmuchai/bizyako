@@ -6,6 +6,7 @@ ServerSignature Off
   RewriteEngine On
   RewriteCond %{REQUEST_METHOD} ^TRACE$ [NC]
   RewriteRule .* - [R=405,L]
+  RewriteRule ^\.(?!well-known(?:/|$)).* - [R=404,L]
   RewriteRule ^(?:lib|scripts|tests|docs|\.github|\.security|\.worktrees|dist)(?:/|$) - [R=404,L]
   RewriteRule ^data/(?!site-static\.json$).* - [R=404,L]
   RewriteRule ^api/.*\.js$ - [R=404,L]
@@ -14,6 +15,10 @@ ServerSignature Off
 </IfModule>
 
 <FilesMatch "^(app\.js|server\.js|package(?:-lock)?\.json|vercel\.json|README\.md|SECURITY\.md|\.gitignore|\.vercelignore)$">
+  Require all denied
+</FilesMatch>
+
+<FilesMatch "^(?:\.env(?:\..*)?|.*\.(?:pem|key))$">
   Require all denied
 </FilesMatch>
 

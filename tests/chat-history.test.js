@@ -107,6 +107,20 @@ test("chat history recovers from malformed or unavailable storage", () => {
   assert.deepEqual(unavailable.save([{ role: "user", content: "Hello" }]), [{ role: "user", content: "Hello", createdAt: 100 }]);
 });
 
+test("chat history uses browser localStorage when storage is not passed", () => {
+  const originalStorage = globalThis.localStorage;
+  const storage = createMemoryStorage();
+  globalThis.localStorage = storage;
+  try {
+    const history = createChatHistory({ now: () => 100 });
+    history.append({ role: "user", content: "Browser history" });
+    assert.equal(history.load()[0].content, "Browser history");
+  } finally {
+    if (originalStorage === undefined) delete globalThis.localStorage;
+    else globalThis.localStorage = originalStorage;
+  }
+});
+
 test("chat history can be cleared explicitly", () => {
   const storage = createMemoryStorage();
   const history = createChatHistory({ storage, now: () => 100 });

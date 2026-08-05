@@ -40,6 +40,29 @@ Open **Setup Node.js App**, select the BizYako application, and add the same thr
 
 Use cPanel permissions appropriate for the account: directories `0755`, public files `0644`, and owner-only temporary credential files `0600`. Remove deployment ZIPs from the public application directory after extraction and verification.
 
+## Advisor provider setup
+
+The focused advisor runs only through the server-side /api/chat route. Configure these protected environment variables on each active host:
+
+- SILICONFLOW_API_KEY: an active SiliconFlow account key; never commit it or expose it to browser JavaScript.
+- SILICONFLOW_BASE_URL: https://api.siliconflow.com/v1
+- SILICONFLOW_MODEL: openai/gpt-oss-120b
+- SILICONFLOW_MODEL_2: google/gemma-4-31B-it
+
+For **Vercel**, add all four under Project Settings, Environment Variables for Production, Preview, and Development as required, then redeploy. For **Namecheap cPanel**, open Setup Node.js App, select BizYako, add the same four under Environment variables, save, and restart the application. Do not upload .env, .env.local, or a ZIP containing either file.
+
+If a provider key is pasted into chat, email, a ticket, source code, logs, or another uncontrolled location, treat it as exposed. Create a replacement in the same SiliconFlow account, update both hosts, restart or redeploy, verify /api/chat, then revoke the retired key. Account credit remains with the provider account rather than a specific key.
+
+Advisor conversations are stored only in that visitor's browser for 30 days and can be cleared from the chat panel. The browser store is bounded and excludes the separate name-and-phone lead fields. The server redacts email addresses and phone-like values before sending conversation context to the provider. API responses use no-store, and the service worker handles all /api/* routes network-only.
+
+Verify each host without displaying credentials:
+
+1. Send an English and a Swahili product question and confirm /api/chat returns a focused BizYako response.
+2. Confirm a provider outage uses the built-in product guide and does not reveal model, credential, or provider response details.
+3. Confirm repeated requests receive 429, oversized or invalid conversations receive 400 or 413, and a missing key fails closed with 503.
+4. Reload the page and confirm conversation history returns, then use **Clear** and confirm it is removed.
+5. Inspect browser caches and confirm no /api/chat response is present.
+
 ## Infrastructure fingerprinting
 
 The cPanel `.htaccess` removes `Server`, `X-Powered-By`, `X-Turbo-Charged-By`, and LiteSpeed cache headers where the hosting layer permits overrides. After every cPanel deployment, inspect the live response headers. If `Server: LiteSpeed` or `X-Turbo-Charged-By: LiteSpeed` remains, ask Namecheap support to enable LiteSpeed **Hide Full Header** for `bizyako.com`; a shared-hosting server can add these headers after the application has responded.

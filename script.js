@@ -21,12 +21,25 @@ const supportChatButton = document.querySelector("[data-support-chat]");
 const chatPanel = document.querySelector("[data-chat-panel]");
 const chatClose = document.querySelector("[data-chat-close]");
 const chatMessages = document.querySelector("[data-chat-messages]");
-const chatContact = document.querySelector("[data-chat-contact]");
+const chatForm = document.querySelector("[data-chat-form]");
+const chatInput = document.querySelector("[data-chat-input]");
+const chatSend = document.querySelector("[data-chat-send]");
+const chatStatus = document.querySelector("[data-chat-status]");
+const chatClear = document.querySelector("[data-chat-clear]");
+const chatLeadToggle = document.querySelector("[data-chat-lead-toggle]");
+const chatLeadForm = document.querySelector("[data-chat-lead-form]");
+const chatLeadStatus = document.querySelector("[data-chat-lead-status]");
 const leadBuilder = document.querySelector("[data-lead-builder]");
 const leadForm = document.querySelector("[data-lead-form]");
 const openLeadButtons = document.querySelectorAll("[data-open-lead-builder]");
 const installAppButton = document.querySelector("[data-install-app]");
-const secureForms = [contactForm, demoForm, leadForm].filter(Boolean);
+const chatHistory = window.BizYakoChatHistory?.createChatHistory?.() || {
+  append: () => [],
+  clear: () => {},
+  load: () => [],
+  save: (messages) => messages,
+};
+const secureForms = [contactForm, demoForm, leadForm, chatLeadForm].filter(Boolean);
 
 const prepareSecureForm = (form) => {
   const startedAt = form.querySelector('[name="formStartedAt"]');
@@ -435,19 +448,102 @@ const productGuides = {
   },
 };
 
-const appendChatMessage = (type, content) => {
-  if (!chatMessages) return;
-  const bubble = document.createElement("article");
-  bubble.className = `chat-bubble ${type}`;
-  if (typeof content === "string") {
-    bubble.innerHTML = `<span>${escapeHtml(content)}</span>`;
-  } else {
-    bubble.innerHTML = content;
+const appendChatActions = (bubble, intent) => {
+  const actions = document.createElement("div");
+  actions.className = "chat-inline-actions";
+
+  if (intent && intent !== "custom") {
+    const demoLink = document.createElement("a");
+    demoLink.href = `product-demo.html?product=${encodeURIComponent(intent)}`;
+    demoLink.textContent = "Preview demo";
+    actions.appendChild(demoLink);
   }
-  chatMessages.appendChild(bubble);
-  chatMessages.scrollTop = chatMessages.scrollHeight;
+
+  const specialistButton = document.createElement("button");
+  specialistButton.type = "button";
+  specialistButton.dataset.chatLeadToggle = "";
+  specialistButton.textContent = "Talk to a specialist";
+  actions.appendChild(specialistButton);
+
+  bubble.appendChild(actions);
 };
 
+const appendChatMessage = (type, content, { persist = false, title = "", intent = "" } = {}) => {
+  if (!chatMessages) return null;
+  const normalizedType = type === "user" ? "user" : "bot";
+  const bubble = document.createElement("article");
+  bubble.className = `chat-bubble ${normalizedType}`;
+
+  if (title) {
+    const heading = document.createElement("strong");
+    heading.textContent = title;
+    bubble.appendChild(heading);
+  }
+
+  const bubbleText = document.createElement("span");
+  bubbleText.textContent = String(content || "");
+  bubble.appendChild(bubbleText);
+
+  if (normalizedType === "bot" && intent) appendChatActions(bubble, intent);
+  chatMessages.appendChild(bubble);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+
+  if (persist) {
+    chatHistory.append({
+      role: normalizedType === "user" ? "user" : "assistant",
+      content: String(content || ""),
+      createdAt: Date.now(),
+    });
+  }
+  return bubble;
+};
+
+const renderChatWelcome = () => {
+  if (!chatMessages) return;
+  appendChatMessage("bot", "Tell me what you want to improve. I can compare products, shape a first release, or help you prepare for a demo.", {
+    title: "Welcome to BizYako.",
+  });
+};
+
+const showChatTyping = () => {
+  if (!chatMessages) return null;
+  const typing = document.createElement("article");
+  typing.className = "chat-bubble bot chat-typing";
+  typing.setAttribute("data-chat-typing", "");
+  typing.setAttribute("aria-label", "BizYako advisor is preparing a reply");
+  for (let index = 0; index < 3; index += 1) typing.appendChild(document.createElement("span"));
+  chatMessages.appendChild(typing);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+  return typing;
+};
+
+const setChatStatus = (message, state = "ready") => {
+  if (!chatStatus) return;
+  chatStatus.textContent = message;
+  chatStatus.dataset.state = state;
+};
+
+const setChatBusy = (busy) => {
+  if (chatInput) chatInput.disabled = busy;
+  if (chatSend) chatSend.disabled = busy;
+  chatPanel?.querySelectorAll("[data-chat-intent]").forEach((button) => {
+    button.disabled = busy;
+  });
+};
+
+const restoreChatHistory = () => {
+  if (!chatMessages) return;
+  const restored = chatHistory.load();
+  chatMessages.replaceChildren();
+  if (!restored.length) {
+    renderChatWelcome();
+    return;
+  }
+  restored.forEach((message) => {
+    appendChatMessage(message.role === "user" ? "user" : "bot", message.content);
+  });
+  setChatStatus("Conversation restored from this device");
+};
 const openChatPanel = () => {
   if (!chatPanel) return;
   chatPanel.classList.add("open");
@@ -455,6 +551,7 @@ const openChatPanel = () => {
   chatPanel.removeAttribute("inert");
   supportChatButton?.classList.add("active");
   supportChatButton?.setAttribute("aria-expanded", "true");
+  if (window.innerWidth > 760) window.setTimeout(() => chatInput?.focus(), 180);
 };
 
 const closeChatPanel = () => {
@@ -496,18 +593,96 @@ const closeLeadBuilder = () => {
   document.body.classList.remove("modal-open");
 };
 
+let chatBusy = false;
+
+const inferChatIntent = (message) => {
+  const text = String(message || "").toLowerCase();
+  const intentTerms = [
+    ["law", ["law firm", "legal crm", "matters", "advocate"]],
+    ["erp", ["erp", "inventory", "procurement", "finance", "operations"]],
+    ["pos", ["pos", "point of sale", "checkout", "retail"]],
+    ["analytics", ["analytics", "dashboard", "reporting", "business intelligence"]],
+    ["isp", ["isp", "subscriber", "network billing", "internet provider"]],
+    ["agents", ["ai agent", "automation", "automate", "follow-up"]],
+    ["mobile", ["mobile app", "android", "ios"]],
+    ["pwa", ["pwa", "progressive web app", "installable web"]],
+    ["websites", ["website", "ecommerce", "web portal"]],
+  ];
+  return intentTerms.find(([, terms]) => terms.some((term) => text.includes(term)))?.[0] || "";
+};
+
+const advisorContext = () => chatHistory
+  .load()
+  .slice(-10)
+  .map((message) => ({
+    role: message.role,
+    content: message.content.slice(0, 1000),
+  }));
+
+const sendAdvisorMessage = async (message, { intent = "" } = {}) => {
+  const content = String(message || "").trim().slice(0, 1000);
+  if (!content || chatBusy) return;
+  const resolvedIntent = intent || inferChatIntent(content);
+  if (!intent && resolvedIntent) activateProduct(resolvedIntent, false);
+
+  chatBusy = true;
+  appendChatMessage("user", content, { persist: true });
+  setChatBusy(true);
+  setChatStatus("Advisor is thinking...", "working");
+  const typing = showChatTyping();
+
+  try {
+    const response = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages: advisorContext() }),
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok || !result.ok || typeof result.reply !== "string") {
+      throw new Error("Advisor unavailable");
+    }
+
+    typing?.remove();
+    appendChatMessage("bot", result.reply, { persist: true, intent: resolvedIntent });
+    setChatStatus(result.fallback ? "Advisor online via backup model" : "Advisor online", "ready");
+  } catch {
+    typing?.remove();
+    const guide = productGuides[resolvedIntent] || productGuides[activeProductId] || productGuides.custom;
+    appendChatMessage("bot", `${guide.text} ${guide.next}`, {
+      persist: true,
+      title: guide.title,
+      intent: resolvedIntent || activeProductId,
+    });
+    setChatStatus("Using the built-in product guide", "fallback");
+  } finally {
+    chatBusy = false;
+    setChatBusy(false);
+    if (chatInput) {
+      chatInput.value = "";
+      chatInput.style.height = "";
+      chatInput.focus();
+    }
+    const userTurns = chatHistory.load().filter((messageItem) => messageItem.role === "user").length;
+    chatLeadToggle?.classList.toggle("recommended", userTurns >= 2);
+  }
+};
+
 const handleChatIntent = (intent) => {
   const guide = productGuides[intent] || productGuides.custom;
-  appendChatMessage("user", guide.user);
-  window.setTimeout(() => {
-    appendChatMessage(
-      "bot",
-      `<strong>${escapeHtml(guide.title)}</strong><span>${escapeHtml(guide.text)}</span><span>${escapeHtml(guide.next)}</span><div class="chat-inline-actions"><button type="button" data-open-lead-builder>Define product</button><a href="#contact" data-chat-contact>Book consultation</a></div>`
-    );
-  }, 180);
-
   if (intent !== "custom") activateProduct(intent, false);
-  if (intent === "custom") window.setTimeout(() => openLeadBuilder(activeProductId), 520);
+  sendAdvisorMessage(guide.user, { intent });
+};
+
+const toggleChatLeadCapture = (forceOpen) => {
+  if (!chatLeadForm) return;
+  const shouldOpen = typeof forceOpen === "boolean" ? forceOpen : chatLeadForm.hidden;
+  chatLeadForm.hidden = !shouldOpen;
+  chatLeadToggle?.setAttribute("aria-expanded", String(shouldOpen));
+  if (shouldOpen) {
+    const startedAt = chatLeadForm.querySelector('[name="formStartedAt"]');
+    if (startedAt && !startedAt.value) startedAt.value = String(Date.now());
+    chatLeadForm.querySelector("input:not(.form-honeypot)")?.focus();
+  }
 };
 
 supportChatButton?.addEventListener("click", () => {
@@ -515,6 +690,29 @@ supportChatButton?.addEventListener("click", () => {
   else openChatPanel();
 });
 chatClose?.addEventListener("click", closeChatPanel);
+chatClear?.addEventListener("click", () => {
+  chatHistory.clear();
+  chatMessages?.replaceChildren();
+  renderChatWelcome();
+  setChatStatus("Conversation cleared");
+  chatLeadToggle?.classList.remove("recommended");
+});
+
+chatForm?.addEventListener("submit", (event) => {
+  event.preventDefault();
+  sendAdvisorMessage(chatInput?.value);
+});
+chatInput?.addEventListener("keydown", (event) => {
+  if (event.key === "Enter" && !event.shiftKey) {
+    event.preventDefault();
+    chatForm?.requestSubmit();
+  }
+});
+chatInput?.addEventListener("input", () => {
+  chatInput.style.height = "auto";
+  chatInput.style.height = `${Math.min(chatInput.scrollHeight, 112)}px`;
+});
+
 chatPanel?.addEventListener("click", (event) => {
   const quick = event.target.closest("[data-chat-intent]");
   if (quick) handleChatIntent(quick.dataset.chatIntent);
@@ -522,9 +720,69 @@ chatPanel?.addEventListener("click", (event) => {
   const leadButton = event.target.closest("[data-open-lead-builder]");
   if (leadButton) openLeadBuilder(activeProductId);
 
+  const specialistButton = event.target.closest("[data-chat-lead-toggle]");
+  if (specialistButton) toggleChatLeadCapture(true);
+
   const contactLink = event.target.closest("[data-chat-contact]");
   if (contactLink) closeChatPanel();
 });
+
+chatLeadForm?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const data = Object.fromEntries(new FormData(chatLeadForm).entries());
+  const name = String(data.chatLeadName || "").trim();
+  const phone = String(data.chatLeadPhone || "").trim();
+  const phoneDigits = phone.split("").filter((character) => "0123456789".includes(character)).join("");
+  const button = chatLeadForm.querySelector('button[type="submit"]');
+
+  if (name.length < 2 || phoneDigits.length < 9 || phoneDigits.length > 15) {
+    if (chatLeadStatus) chatLeadStatus.textContent = "Enter a valid name and phone number.";
+    return;
+  }
+
+  const productLabel = productGuides[activeProductId]?.title || "BizYako business system";
+  const payload = {
+    name,
+    need: "Advisor specialist follow-up",
+    website: data.website,
+    formStartedAt: Number(data.formStartedAt),
+    message: `Callback request. Phone: ${phone}. Current interest: ${productLabel}`,
+  };
+  button.disabled = true;
+  button.textContent = "Preparing handoff...";
+
+  try {
+    const response = await fetch("/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const result = await response.json();
+    if (!response.ok || !result.ok) throw new Error("Lead handoff unavailable");
+
+    const whatsappLink = document.createElement("a");
+    whatsappLink.href = `https://wa.me/254754959895?text=${encodeURIComponent(`Hello BizYako, I am ${name}. Please contact me on ${phone} about ${productLabel}.`)}`;
+    whatsappLink.target = "_blank";
+    whatsappLink.rel = "noopener";
+    whatsappLink.textContent = "Continue on WhatsApp";
+    chatLeadStatus?.replaceChildren(document.createTextNode("Your details are ready. "), whatsappLink);
+    button.textContent = "Details prepared";
+  } catch {
+    if (chatLeadStatus) chatLeadStatus.textContent = "Please use WhatsApp or the full consultation form below.";
+    button.textContent = "Try again";
+    button.disabled = false;
+    return;
+  }
+
+  window.setTimeout(() => {
+    chatLeadForm.reset();
+    prepareSecureForm(chatLeadForm);
+    button.textContent = "Request a callback";
+    button.disabled = false;
+  }, 2500);
+});
+
+restoreChatHistory();
 openLeadButtons.forEach((button) => button.addEventListener("click", () => openLeadBuilder(activeProductId)));
 document.querySelectorAll("[data-lead-close]").forEach((item) => item.addEventListener("click", closeLeadBuilder));
 

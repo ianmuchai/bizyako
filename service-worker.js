@@ -1,12 +1,13 @@
 const CACHE_PREFIX = "bizyako-";
-const CACHE_NAME = "bizyako-shell-v10";
+const CACHE_NAME = "bizyako-shell-v11";
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=20260802-5",
-  "/script.js?v=20260802-5",
+  "/styles.css?v=20260805-1",
+  "/script.js?v=20260805-1",
+  "/chat-history.js?v=20260805-1",
   "/product-demo.html",
-  "/product-demo.js?v=20260802-5",
+  "/product-demo.js?v=20260805-1",
   "/manifest.webmanifest",
   "/data/site-static.json",
   "/assets/bizyako-logo.png",
@@ -46,7 +47,7 @@ self.addEventListener("fetch", (event) => {
   if (url.pathname.includes("by-admin")) return;
 
   if (url.pathname.startsWith("/api/")) {
-    event.respondWith(networkFirst(request));
+    event.respondWith(networkOnlyApi(request));
     return;
   }
 
@@ -68,6 +69,24 @@ async function cacheFirst(request) {
     cache.put(request, response.clone());
   }
   return response;
+}
+
+async function networkOnlyApi(request) {
+  try {
+    return await fetch(request, { cache: "no-store" });
+  } catch {
+    return new Response(JSON.stringify({
+      ok: false,
+      offline: true,
+      message: "BizYako is offline. Please reconnect and try again.",
+    }), {
+      status: 503,
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+        "Cache-Control": "no-store",
+      },
+    });
+  }
 }
 
 async function networkFirst(request, fallbackPath = null) {
