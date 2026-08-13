@@ -58,13 +58,13 @@ test("WhatsApp launcher uses the WhatsApp-authored brand mark", () => {
   assert.match(homepage, /class="whatsapp-mark"[^>]*d="M307\.546 52\.5655C273\.709 18\.685[^"]*"[^>]*fill="#25D366"/);
 });
 
-test("support rail floats near the viewport midpoint without moving the assistant panel", () => {
+test("support rail floats near the viewport midpoint with a raised assistant panel", () => {
   const styles = fs.readFileSync(path.join(root, "styles.css"), "utf8");
   const finalVisualSystem = styles.slice(styles.indexOf("/* 2026 wide visual system and support refinement */"));
 
   assert.match(finalVisualSystem, /\.support-hub\s*\{[^}]*top:\s*52%;[^}]*right:\s*18px;[^}]*bottom:\s*auto;[^}]*transform:\s*translateY\(-50%\)/s);
   assert.match(finalVisualSystem, /@media \(max-width:\s*620px\)[\s\S]*?\.support-hub\s*\{[^}]*top:\s*58%;[^}]*right:\s*10px;[^}]*bottom:\s*auto;/s);
-  assert.match(finalVisualSystem, /\.chat-panel\s*\{[^}]*bottom:\s*18px/s);
+  assert.match(finalVisualSystem, /\.chat-panel\s*\{[^}]*bottom:\s*72px/s);
 });
 
 test("mobile support rail has a dedicated no-overlap control lane", () => {
@@ -72,4 +72,15 @@ test("mobile support rail has a dedicated no-overlap control lane", () => {
   const finalVisualSystem = styles.slice(styles.indexOf("/* 2026 wide visual system and support refinement */"));
 
   assert.match(finalVisualSystem, /@media \(max-width:\s*620px\)[\s\S]*?\.hero-carousel-controls,\s*\.enhanced-signals\s*\{[^}]*max-width:\s*calc\(100% - 58px\);/s);
+});
+test("advisor panel omits conversion prompts and floats above the viewport edge", () => {
+  const homepage = fs.readFileSync(path.join(root, "index.html"), "utf8");
+  const script = fs.readFileSync(path.join(root, "script.js"), "utf8");
+  const styles = fs.readFileSync(path.join(root, "styles.css"), "utf8");
+  const focusedAdvisor = styles.slice(styles.indexOf("/* Focused advisor */"));
+
+  assert.doesNotMatch(homepage, /Focused on BizYako products|Define a product|Talk to a specialist/);
+  assert.doesNotMatch(homepage + script, /data-chat-lead-toggle|chatLeadForm|appendChatActions/);
+  assert.match(focusedAdvisor, /\.chat-panel\s*\{[^}]*bottom:\s*72px;/s);
+  assert.match(focusedAdvisor, /@media \(max-width:\s*760px\)[\s\S]*?\.chat-panel\s*\{[^}]*bottom:\s*max\(24px,\s*env\(safe-area-inset-bottom\)\);/s);
 });

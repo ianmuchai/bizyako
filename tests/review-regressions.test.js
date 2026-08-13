@@ -28,7 +28,6 @@ test("product controls expose active state and honor reduced motion", () => {
 
 test("refined interactive controls retain 44px touch targets", () => {
   assert.match(styles, /\.chat-quick-actions button,[\s\S]*?min-height:\s*44px/);
-  assert.match(styles, /\.chat-footer-actions \.button\s*\{[^}]*min-height:\s*44px/s);
   assert.match(styles, /@media \(max-width:\s*620px\)[\s\S]*?\.install-app\s*\{[^}]*min-height:\s*44px/s);
 });
 

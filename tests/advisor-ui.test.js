@@ -8,7 +8,7 @@ const path = require("node:path");
 const root = path.join(__dirname, "..");
 const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
 
-test("homepage exposes a focused, accessible advisor composer and lead handoff", () => {
+test("homepage exposes a focused, accessible advisor composer without conversion prompts", () => {
   const html = read("index.html");
 
   assert.ok(html.includes("data-chat-form"));
@@ -16,9 +16,6 @@ test("homepage exposes a focused, accessible advisor composer and lead handoff",
   assert.ok(html.includes("data-chat-send"));
   assert.match(html, /data-chat-status[^>]*role="status"/);
   assert.ok(html.includes("data-chat-clear"));
-  assert.ok(html.includes("data-chat-lead-form"));
-  assert.ok(html.includes('name="chatLeadName"'));
-  assert.match(html, /input[^>]*type="tel"[^>]*name="chatLeadPhone"/);
   assert.ok(html.indexOf("chat-history.js") < html.indexOf("script.js"));
 });
 
@@ -31,7 +28,7 @@ test("advisor UI calls the private endpoint, restores history, and renders model
   assert.ok(script.includes("chatHistory.clear"));
   assert.ok(script.includes("bubbleText.textContent ="));
   assert.ok(script.includes("data-chat-typing"));
-  assert.ok(script.includes("data-chat-lead-form"));
+  assert.ok(script.includes("appendChatDemoLink"));
   assert.ok(script.includes('fetch("/api/contact"'));
 });
 

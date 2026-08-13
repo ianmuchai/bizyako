@@ -54,8 +54,8 @@ test("every homepage lead flow submits honeypot and elapsed-time fields", () => 
   const html = read("index.html");
   const script = read("script.js");
 
-  assert.equal((html.match(/name="website"/g) || []).length, 4);
-  assert.equal((html.match(/name="formStartedAt"/g) || []).length, 4);
+  assert.equal((html.match(/name="website"/g) || []).length, 3);
+  assert.equal((html.match(/name="formStartedAt"/g) || []).length, 3);
   assert.match(script, /prepareSecureForm/);
   assert.match(script, /website:\s*data\.website/);
   assert.match(script, /formStartedAt:\s*Number\(data\.formStartedAt\)/);

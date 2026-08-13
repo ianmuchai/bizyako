@@ -26,9 +26,6 @@ const chatInput = document.querySelector("[data-chat-input]");
 const chatSend = document.querySelector("[data-chat-send]");
 const chatStatus = document.querySelector("[data-chat-status]");
 const chatClear = document.querySelector("[data-chat-clear]");
-const chatLeadToggle = document.querySelector("[data-chat-lead-toggle]");
-const chatLeadForm = document.querySelector("[data-chat-lead-form]");
-const chatLeadStatus = document.querySelector("[data-chat-lead-status]");
 const leadBuilder = document.querySelector("[data-lead-builder]");
 const leadForm = document.querySelector("[data-lead-form]");
 const openLeadButtons = document.querySelectorAll("[data-open-lead-builder]");
@@ -39,7 +36,7 @@ const chatHistory = window.BizYakoChatHistory?.createChatHistory?.() || {
   load: () => [],
   save: (messages) => messages,
 };
-const secureForms = [contactForm, demoForm, leadForm, chatLeadForm].filter(Boolean);
+const secureForms = [contactForm, demoForm, leadForm].filter(Boolean);
 
 const prepareSecureForm = (form) => {
   const startedAt = form.querySelector('[name="formStartedAt"]');
@@ -448,23 +445,15 @@ const productGuides = {
   },
 };
 
-const appendChatActions = (bubble, intent) => {
+const appendChatDemoLink = (bubble, intent) => {
+  if (!intent || intent === "custom") return;
+
   const actions = document.createElement("div");
   actions.className = "chat-inline-actions";
-
-  if (intent && intent !== "custom") {
-    const demoLink = document.createElement("a");
-    demoLink.href = `product-demo.html?product=${encodeURIComponent(intent)}`;
-    demoLink.textContent = "Preview demo";
-    actions.appendChild(demoLink);
-  }
-
-  const specialistButton = document.createElement("button");
-  specialistButton.type = "button";
-  specialistButton.dataset.chatLeadToggle = "";
-  specialistButton.textContent = "Talk to a specialist";
-  actions.appendChild(specialistButton);
-
+  const demoLink = document.createElement("a");
+  demoLink.href = `product-demo.html?product=${encodeURIComponent(intent)}`;
+  demoLink.textContent = "Preview demo";
+  actions.appendChild(demoLink);
   bubble.appendChild(actions);
 };
 
@@ -484,7 +473,7 @@ const appendChatMessage = (type, content, { persist = false, title = "", intent 
   bubbleText.textContent = String(content || "");
   bubble.appendChild(bubbleText);
 
-  if (normalizedType === "bot" && intent) appendChatActions(bubble, intent);
+  if (normalizedType === "bot" && intent) appendChatDemoLink(bubble, intent);
   chatMessages.appendChild(bubble);
   chatMessages.scrollTop = chatMessages.scrollHeight;
 
@@ -662,8 +651,6 @@ const sendAdvisorMessage = async (message, { intent = "" } = {}) => {
       chatInput.style.height = "";
       chatInput.focus();
     }
-    const userTurns = chatHistory.load().filter((messageItem) => messageItem.role === "user").length;
-    chatLeadToggle?.classList.toggle("recommended", userTurns >= 2);
   }
 };
 
@@ -671,18 +658,6 @@ const handleChatIntent = (intent) => {
   const guide = productGuides[intent] || productGuides.custom;
   if (intent !== "custom") activateProduct(intent, false);
   sendAdvisorMessage(guide.user, { intent });
-};
-
-const toggleChatLeadCapture = (forceOpen) => {
-  if (!chatLeadForm) return;
-  const shouldOpen = typeof forceOpen === "boolean" ? forceOpen : chatLeadForm.hidden;
-  chatLeadForm.hidden = !shouldOpen;
-  chatLeadToggle?.setAttribute("aria-expanded", String(shouldOpen));
-  if (shouldOpen) {
-    const startedAt = chatLeadForm.querySelector('[name="formStartedAt"]');
-    if (startedAt && !startedAt.value) startedAt.value = String(Date.now());
-    chatLeadForm.querySelector("input:not(.form-honeypot)")?.focus();
-  }
 };
 
 supportChatButton?.addEventListener("click", () => {
@@ -695,7 +670,6 @@ chatClear?.addEventListener("click", () => {
   chatMessages?.replaceChildren();
   renderChatWelcome();
   setChatStatus("Conversation cleared");
-  chatLeadToggle?.classList.remove("recommended");
 });
 
 chatForm?.addEventListener("submit", (event) => {
@@ -720,66 +694,8 @@ chatPanel?.addEventListener("click", (event) => {
   const leadButton = event.target.closest("[data-open-lead-builder]");
   if (leadButton) openLeadBuilder(activeProductId);
 
-  const specialistButton = event.target.closest("[data-chat-lead-toggle]");
-  if (specialistButton) toggleChatLeadCapture(true);
-
   const contactLink = event.target.closest("[data-chat-contact]");
   if (contactLink) closeChatPanel();
-});
-
-chatLeadForm?.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  const data = Object.fromEntries(new FormData(chatLeadForm).entries());
-  const name = String(data.chatLeadName || "").trim();
-  const phone = String(data.chatLeadPhone || "").trim();
-  const phoneDigits = phone.split("").filter((character) => "0123456789".includes(character)).join("");
-  const button = chatLeadForm.querySelector('button[type="submit"]');
-
-  if (name.length < 2 || phoneDigits.length < 9 || phoneDigits.length > 15) {
-    if (chatLeadStatus) chatLeadStatus.textContent = "Enter a valid name and phone number.";
-    return;
-  }
-
-  const productLabel = productGuides[activeProductId]?.title || "BizYako business system";
-  const payload = {
-    name,
-    need: "Advisor specialist follow-up",
-    website: data.website,
-    formStartedAt: Number(data.formStartedAt),
-    message: `Callback request. Phone: ${phone}. Current interest: ${productLabel}`,
-  };
-  button.disabled = true;
-  button.textContent = "Preparing handoff...";
-
-  try {
-    const response = await fetch("/api/contact", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    const result = await response.json();
-    if (!response.ok || !result.ok) throw new Error("Lead handoff unavailable");
-
-    const whatsappLink = document.createElement("a");
-    whatsappLink.href = `https://wa.me/254754959895?text=${encodeURIComponent(`Hello BizYako, I am ${name}. Please contact me on ${phone} about ${productLabel}.`)}`;
-    whatsappLink.target = "_blank";
-    whatsappLink.rel = "noopener";
-    whatsappLink.textContent = "Continue on WhatsApp";
-    chatLeadStatus?.replaceChildren(document.createTextNode("Your details are ready. "), whatsappLink);
-    button.textContent = "Details prepared";
-  } catch {
-    if (chatLeadStatus) chatLeadStatus.textContent = "Please use WhatsApp or the full consultation form below.";
-    button.textContent = "Try again";
-    button.disabled = false;
-    return;
-  }
-
-  window.setTimeout(() => {
-    chatLeadForm.reset();
-    prepareSecureForm(chatLeadForm);
-    button.textContent = "Request a callback";
-    button.disabled = false;
-  }, 2500);
 });
 
 restoreChatHistory();
