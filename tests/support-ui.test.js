@@ -67,11 +67,32 @@ test("support rail floats near the viewport midpoint with a raised assistant pan
   assert.match(finalVisualSystem, /\.chat-panel\s*\{[^}]*bottom:\s*72px/s);
 });
 
-test("mobile support rail has a dedicated no-overlap control lane", () => {
+test("mobile support launchers stack vertically above the viewport edge", () => {
   const styles = fs.readFileSync(path.join(root, "styles.css"), "utf8");
-  const finalVisualSystem = styles.slice(styles.indexOf("/* 2026 wide visual system and support refinement */"));
+  const mobileSystem = styles.slice(styles.indexOf("/* Mobile experience refinement */"));
 
-  assert.match(finalVisualSystem, /@media \(max-width:\s*620px\)[\s\S]*?\.hero-carousel-controls,\s*\.enhanced-signals\s*\{[^}]*max-width:\s*calc\(100% - 58px\);/s);
+  assert.match(
+    mobileSystem,
+    /@media \(max-width:\s*620px\)[\s\S]*?\.support-hub\s*\{[^}]*top:\s*auto;[^}]*bottom:\s*max\(96px,\s*env\(safe-area-inset-bottom\)\);[^}]*grid-template-columns:\s*50px;/s
+  );
+});
+
+test("footer contact items form a horizontal grid at every responsive size", () => {
+  const styles = fs.readFileSync(path.join(root, "styles.css"), "utf8");
+  const mobileSystem = styles.slice(styles.indexOf("/* Mobile experience refinement */"));
+
+  assert.match(
+    mobileSystem,
+    /\.footer-contact-panel\s*\{[^}]*grid-column:\s*1 \/ -1;[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\);/s
+  );
+  assert.match(
+    mobileSystem,
+    /@media \(max-width:\s*620px\)[\s\S]*?\.footer-contact-panel\s*\{[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\);/s
+  );
+  assert.match(
+    mobileSystem,
+    /@media \(max-width:\s*620px\)[\s\S]*?\.footer-grid\s*\{[^}]*grid-template-columns:\s*1fr;/s
+  );
 });
 test("advisor panel omits conversion prompts and floats above the viewport edge", () => {
   const homepage = fs.readFileSync(path.join(root, "index.html"), "utf8");

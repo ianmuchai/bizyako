@@ -40,22 +40,22 @@ test("public assets and shell cache are versioned for reliable updates", () => {
   const worker = fs.readFileSync(path.join(root, "service-worker.js"), "utf8");
   const publicFiles = [homepage, demo, admin, worker];
 
-  assert.match(homepage, /styles\.css\?v=20260814-1/);
-  assert.match(homepage, /script\.js\?v=20260814-1/);
-  assert.match(homepage, /chat-history\.js\?v=20260814-1/);
-  assert.match(demo, /styles\.css\?v=20260814-1/);
-  assert.match(demo, /product-demo\.js\?v=20260814-1/);
-  assert.match(admin, /styles\.css\?v=20260814-1/);
-  assert.match(admin, /admin\.js\?v=20260814-1/);
-  assert.match(worker, /bizyako-shell-v13/);
-  assert.match(worker, /20260814-1/);
-  assert.ok(worker.includes("chat-history.js?v=20260814-1"));
+  assert.match(homepage, /styles\.css\?v=20260815-1/);
+  assert.match(homepage, /script\.js\?v=20260815-1/);
+  assert.match(homepage, /chat-history\.js\?v=20260815-1/);
+  assert.match(demo, /styles\.css\?v=20260815-1/);
+  assert.match(demo, /product-demo\.js\?v=20260815-1/);
+  assert.match(admin, /styles\.css\?v=20260815-1/);
+  assert.match(admin, /admin\.js\?v=20260815-1/);
+  assert.match(worker, /bizyako-shell-v14/);
+  assert.match(worker, /20260815-1/);
+  assert.ok(worker.includes("chat-history.js?v=20260815-1"));
   assert.ok(worker.includes('if (url.pathname.startsWith("/api/"))'));
   assert.ok(worker.includes("event.respondWith(networkOnlyApi(request));"));
   assert.ok(worker.includes("async function networkOnlyApi"));
   assert.ok(worker.includes('fetch(request, { cache: "no-store" })'));
 
   publicFiles.forEach((source) => {
-    assert.doesNotMatch(source, /bizyako-shell-v12|20260813-1|bizyako-shell-v11|20260805-1|bizyako-shell-v9|20260802-4|bizyako-shell-v8|20260802-3|bizyako-shell-v7|20260802-2|bizyako-shell-v6|20260802-1|bizyako-shell-v5|20260731-2/);
+    assert.doesNotMatch(source, /bizyako-shell-v13|20260814-1|bizyako-shell-v12|20260813-1|bizyako-shell-v11|20260805-1|bizyako-shell-v9|20260802-4|bizyako-shell-v8|20260802-3|bizyako-shell-v7|20260802-2|bizyako-shell-v6|20260802-1|bizyako-shell-v5|20260731-2/);
   });
 });

@@ -8,9 +8,11 @@ const root = path.join(__dirname, "..");
 test("the two first-viewport hero cards receive a restrained accessible shimmer", () => {
   const styles = fs.readFileSync(path.join(root, "styles.css"), "utf8");
   const shimmerStart = styles.indexOf("/* Hero glass shimmer */");
+  const shimmerEnd = styles.indexOf("/* Mobile experience refinement */", shimmerStart);
 
   assert.notEqual(shimmerStart, -1);
-  const shimmer = styles.slice(shimmerStart);
+  assert.notEqual(shimmerEnd, -1);
+  const shimmer = styles.slice(shimmerStart, shimmerEnd);
 
   assert.match(shimmer, /\.hero-mainline,\s*\.hero-console\s*\{[^}]*position:\s*relative;[^}]*overflow:\s*hidden;[^}]*isolation:\s*isolate;/s);
   assert.match(shimmer, /\.hero-mainline::before,\s*\.hero-console::before\s*\{[^}]*pointer-events:\s*none;[^}]*linear-gradient\([^}]*animation:\s*heroCardShimmer\s+7\.6s\s+cubic-bezier\([^)]*\)\s+infinite;/s);
