@@ -40,16 +40,16 @@ test("public assets and shell cache are versioned for reliable updates", () => {
   const worker = fs.readFileSync(path.join(root, "service-worker.js"), "utf8");
   const publicFiles = [homepage, demo, admin, worker];
 
-  assert.match(homepage, /styles\.css\?v=20260815-1/);
-  assert.match(homepage, /script\.js\?v=20260815-1/);
-  assert.match(homepage, /chat-history\.js\?v=20260815-1/);
-  assert.match(demo, /styles\.css\?v=20260815-1/);
-  assert.match(demo, /product-demo\.js\?v=20260815-1/);
-  assert.match(admin, /styles\.css\?v=20260815-1/);
-  assert.match(admin, /admin\.js\?v=20260815-1/);
-  assert.match(worker, /bizyako-shell-v14/);
-  assert.match(worker, /20260815-1/);
-  assert.ok(worker.includes("chat-history.js?v=20260815-1"));
+  assert.match(homepage, /styles\.css\?v=20260815-2/);
+  assert.match(homepage, /script\.js\?v=20260815-2/);
+  assert.match(homepage, /chat-history\.js\?v=20260815-2/);
+  assert.match(demo, /styles\.css\?v=20260815-2/);
+  assert.match(demo, /product-demo\.js\?v=20260815-2/);
+  assert.match(admin, /styles\.css\?v=20260815-2/);
+  assert.match(admin, /admin\.js\?v=20260815-2/);
+  assert.match(worker, /bizyako-shell-v15/);
+  assert.match(worker, /20260815-2/);
+  assert.ok(worker.includes("chat-history.js?v=20260815-2"));
   assert.ok(worker.includes('if (url.pathname.startsWith("/api/"))'));
   assert.ok(worker.includes("event.respondWith(networkOnlyApi(request));"));
   assert.ok(worker.includes("async function networkOnlyApi"));

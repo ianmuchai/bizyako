@@ -42,7 +42,7 @@ test("strict CSP compatibility leaves service-worker registration in external sc
   const demo = read("product-demo.html");
   const homepageScript = read("script.js");
   const demoScript = read("product-demo.js");
-  const inlineScriptPattern = /<script(?![^>]*\bsrc=)[^>]*>[\s\S]*?<\/script>/gi;
+  const inlineScriptPattern = /<script(?![^>]*\bsrc=)(?![^>]*type="application\/ld\+json")[^>]*>[\s\S]*?<\/script>/gi;
 
   assert.equal((homepage.match(inlineScriptPattern) || []).length, 0);
   assert.equal((demo.match(inlineScriptPattern) || []).length, 0);

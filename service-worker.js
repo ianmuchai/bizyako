@@ -1,19 +1,17 @@
 const CACHE_PREFIX = "bizyako-";
-const CACHE_NAME = "bizyako-shell-v14";
+const CACHE_NAME = "bizyako-shell-v15";
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css?v=20260815-1",
-  "/script.js?v=20260815-1",
-  "/chat-history.js?v=20260815-1",
+  "/styles.css?v=20260815-2",
+  "/script.js?v=20260815-2",
+  "/chat-history.js?v=20260815-2",
   "/product-demo.html",
-  "/product-demo.js?v=20260815-1",
+  "/product-demo.js?v=20260815-2",
   "/manifest.webmanifest",
   "/data/site-static.json",
   "/assets/bizyako-logo.png",
-  "/assets/bizyako-carousel-impact.png",
-  "/assets/bizyako-carousel-growth.png",
-  "/assets/bizyako-carousel-wave.png",
+  "/assets/bizyako-carousel-impact.webp",
   "/assets/icons/bizyako-192.png",
   "/assets/icons/bizyako-512.png",
 ];

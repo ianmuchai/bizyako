@@ -83,7 +83,7 @@ test("footer contact items form a horizontal grid at every responsive size", () 
 
   assert.match(
     mobileSystem,
-    /\.footer-contact-panel\s*\{[^}]*grid-column:\s*1 \/ -1;[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\);/s
+    /\.footer-contact-panel\s*\{[^}]*grid-column:\s*1 \/ -1;[^}]*grid-template-columns:\s*repeat\(5,\s*minmax\(0,\s*1fr\)\);/s
   );
   assert.match(
     mobileSystem,

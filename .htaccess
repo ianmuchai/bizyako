@@ -2,6 +2,10 @@ DirectoryIndex index.html
 Options -Indexes
 ServerSignature Off
 
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css application/javascript application/json image/svg+xml
+</IfModule>
+
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteCond %{REQUEST_METHOD} ^TRACE$ [NC]
@@ -51,9 +55,9 @@ ServerSignature Off
   Header always set X-Permitted-Cross-Domain-Policies "none"
 
   <FilesMatch "\.(css|js|png|jpg|jpeg|webp|avif|ico)$">
-    Header set Cache-Control "public, max-age=3600"
+    Header set Cache-Control "public, max-age=31536000, immutable"
   </FilesMatch>
-  <FilesMatch "\.(html|json|webmanifest)$">
+  <FilesMatch "\.(html|json|webmanifest|xml|txt)$">
     Header set Cache-Control "no-store, max-age=0"
   </FilesMatch>
   <FilesMatch "^(by-admin\.html|admin\.js)$">

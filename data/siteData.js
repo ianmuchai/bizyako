@@ -94,6 +94,7 @@ const contactDetails = {
   email: "hello@bizyako.com",
   social: {
     x: "https://x.com/bizYako",
+    instagram: "https://www.instagram.com/bizyako/",
   },
 };
 const metrics = {
@@ -151,6 +152,7 @@ function getSitePayload() {
 
 function normalizeLead(payload = {}) {
   const name = String(payload.name || "").trim();
+  const contact = String(payload.contact || "").trim();
   const need = String(payload.need || "").trim();
   const message = String(payload.message || "").trim();
 
@@ -164,6 +166,7 @@ function normalizeLead(payload = {}) {
     lead: {
       id: `BY-${Date.now()}`,
       name,
+      ...(contact ? { contact } : {}),
       need,
       message,
       status: "new",

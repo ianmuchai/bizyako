@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /by-admin
+Disallow: /by-admin.html
+Disallow: /api/
+
+Sitemap: https://bizyako.com/sitemap.xml

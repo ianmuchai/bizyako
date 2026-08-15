@@ -10,6 +10,7 @@ const productList = document.querySelector("[data-product-list]");
 const productDemo = document.querySelector("[data-product-demo]");
 const productPreview = document.querySelector("[data-product-preview]");
 const contactForm = document.querySelector(".contact-form");
+const contactStatus = document.querySelector("[data-contact-status]");
 const industriesGrid = document.querySelector("[data-industries]");
 const apiStatus = document.querySelector("[data-api-status]");
 const demoModal = document.querySelector("[data-demo-modal]");
@@ -47,6 +48,17 @@ const prepareSecureForm = (form) => {
 
 secureForms.forEach(prepareSecureForm);
 
+const rememberFocus = () => {
+  if (document.activeElement instanceof HTMLElement) lastFocusedElement = document.activeElement;
+};
+
+const restoreFocus = () => {
+  window.setTimeout(() => {
+    lastFocusedElement?.focus();
+    lastFocusedElement = null;
+  }, 0);
+};
+
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("/service-worker.js").catch((error) => {
@@ -61,6 +73,7 @@ let activeHeroIndex = 0;
 let pendingDemoUrl = "product-demo.html?product=law";
 let heroTimer;
 let installPrompt = null;
+let lastFocusedElement = null;
 
 const heroArt = document.querySelector("[data-hero-art]");
 const heroKicker = document.querySelector("[data-hero-kicker]");
@@ -69,7 +82,12 @@ const heroCopy = document.querySelector("[data-hero-copy]");
 const heroPrimary = document.querySelector("[data-hero-primary]");
 const heroSecondary = document.querySelector("[data-hero-secondary]");
 const heroControls = document.querySelector("[data-hero-controls]");
+const heroToggle = document.querySelector("[data-hero-toggle]");
 let heroSlideButtons = document.querySelectorAll("[data-hero-slide]");
+let heroCarouselPaused = prefersReducedMotion;
+let heroTransitionTimer;
+let heroTransitionRequest = 0;
+const preloadedHeroImages = new Map();
 
 window.addEventListener("beforeinstallprompt", (event) => {
   event.preventDefault();
@@ -92,7 +110,9 @@ window.addEventListener("appinstalled", () => {
 
 let heroSlides = [
   {
-    image: "assets/bizyako-carousel-impact.png",
+    id: "suite",
+    label: "Suite",
+    image: "assets/bizyako-carousel-impact.webp",
     kicker: "Your Business, Powered by AI.",
     status: "Unified suite live",
     title: "Business software that feels built for you.",
@@ -103,7 +123,9 @@ let heroSlides = [
     secondaryHref: "#contact",
   },
   {
-    image: "assets/bizyako-carousel-growth.png",
+    id: "automation",
+    label: "Automation",
+    image: "assets/bizyako-carousel-growth.webp",
     kicker: "Automation without the chaos",
     status: "AI workflows ready",
     title: "Turn repetitive operations into guided, intelligent workflows.",
@@ -115,7 +137,9 @@ let heroSlides = [
     product: "agents",
   },
   {
-    image: "assets/bizyako-carousel-wave.png",
+    id: "intelligence",
+    label: "Intelligence",
+    image: "assets/bizyako-carousel-wave.webp",
     kicker: "Data that managers can act on",
     status: "Decision layer online",
     title: "From POS to ERP to analytics, your business finally speaks one language.",
@@ -126,53 +150,143 @@ let heroSlides = [
     secondaryHref: "#contact",
     product: "analytics",
   },
+  {
+    id: "operations",
+    label: "Operations",
+    image: "assets/bizyako-carousel-impact.webp",
+    kicker: "Operations connected end to end",
+    status: "ERP layer active",
+    title: "Run approvals, stock, finance, teams, and reports from one connected workspace.",
+    copy: "Launch the modules you need first, then expand into procurement, HR, inventory, accounting, customer records, and management intelligence.",
+    primary: "Explore ERP",
+    secondary: "Talk to us",
+    primaryHref: "#products",
+    secondaryHref: "#contact",
+    product: "erp",
+  },
+  {
+    id: "retail",
+    label: "Retail",
+    image: "assets/bizyako-carousel-growth.webp",
+    kicker: "Sales, stock, and branches in sync",
+    status: "POS stack ready",
+    title: "Give front-office teams speed while management gets real visibility.",
+    copy: "BizYako POS connects checkout, inventory, staff actions, payments, branch reporting, loyalty, and analytics in one practical flow.",
+    primary: "See POS",
+    secondary: "Book a demo",
+    primaryHref: "#products",
+    secondaryHref: "#contact",
+    product: "pos",
+  },
 ];
 
 
+const preloadHeroImage = (source) => {
+  if (!source) return Promise.resolve();
+  if (preloadedHeroImages.has(source)) return preloadedHeroImages.get(source);
+
+  const image = new Image();
+  image.decoding = "async";
+  const ready = new Promise((resolve) => {
+    image.addEventListener("load", resolve, { once: true });
+    image.addEventListener("error", resolve, { once: true });
+  });
+  image.src = source;
+  preloadedHeroImages.set(source, ready);
+  return ready;
+};
+
+const updateHeroToggle = () => {
+  if (!heroToggle) return;
+  const label = heroCarouselPaused ? "Play carousel" : "Pause carousel";
+  heroToggle.setAttribute("aria-label", heroCarouselPaused ? "Play carousel" : "Pause carousel");
+  heroToggle.title = label;
+  heroToggle.dataset.state = heroCarouselPaused ? "paused" : "playing";
+  heroToggle.innerHTML = heroCarouselPaused
+    ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 7 8 5-8 5V7Z" fill="currentColor"/></svg>'
+    : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7v10M15 7v10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+};
+
+const applyHeroSlide = (slide) => {
+  if (heroArt) heroArt.src = slide.image;
+  if (heroKicker) heroKicker.textContent = slide.kicker;
+  if (heroTitle) heroTitle.textContent = slide.title;
+  if (heroCopy) heroCopy.textContent = slide.copy;
+  if (heroPrimary) {
+    heroPrimary.textContent = slide.primary;
+    heroPrimary.href = slide.primaryHref;
+    if (slide.product) heroPrimary.dataset.consoleProduct = slide.product;
+    else delete heroPrimary.dataset.consoleProduct;
+  }
+  if (heroSecondary) {
+    heroSecondary.textContent = slide.secondary;
+    heroSecondary.href = slide.secondaryHref;
+  }
+  if (apiStatus) apiStatus.textContent = slide.status;
+  heroSlideButtons.forEach((button, buttonIndex) => {
+    button.classList.toggle("active", buttonIndex === activeHeroIndex);
+    button.setAttribute("aria-pressed", buttonIndex === activeHeroIndex ? "true" : "false");
+  });
+};
+
 const setHeroSlide = (index) => {
   if (!heroSlides.length) return;
-  const slide = heroSlides[index % heroSlides.length];
-  activeHeroIndex = index % heroSlides.length;
-  document.querySelector('.hero')?.classList.add('hero-transitioning');
+  const normalizedIndex = (index + heroSlides.length) % heroSlides.length;
+  const slide = heroSlides[normalizedIndex];
+  const request = ++heroTransitionRequest;
+  activeHeroIndex = normalizedIndex;
+  window.clearTimeout(heroTransitionTimer);
+  document.querySelector(".hero")?.classList.add("hero-transitioning");
 
-  window.setTimeout(() => {
-    if (heroArt) heroArt.src = slide.image;
-    if (heroKicker) heroKicker.textContent = slide.kicker;
-    if (heroTitle) heroTitle.textContent = slide.title;
-    if (heroCopy) heroCopy.textContent = slide.copy;
-    if (heroPrimary) {
-      heroPrimary.textContent = slide.primary;
-      heroPrimary.href = slide.primaryHref;
-      if (slide.product) heroPrimary.dataset.consoleProduct = slide.product;
-      else delete heroPrimary.dataset.consoleProduct;
-    }
-    if (heroSecondary) {
-      heroSecondary.textContent = slide.secondary;
-      heroSecondary.href = slide.secondaryHref;
-    }
-    if (apiStatus) apiStatus.textContent = slide.status;
-    heroSlideButtons.forEach((button, buttonIndex) => {
-      button.classList.toggle('active', buttonIndex === activeHeroIndex);
-      button.setAttribute('aria-pressed', buttonIndex === activeHeroIndex ? 'true' : 'false');
-    });
-    document.querySelector('.hero')?.classList.remove('hero-transitioning');
-  }, 160);
+  preloadHeroImage(slide.image).then(() => {
+    if (request !== heroTransitionRequest) return;
+    heroTransitionTimer = window.setTimeout(() => {
+      applyHeroSlide(slide);
+      window.requestAnimationFrame(() => {
+        document.querySelector(".hero")?.classList.remove("hero-transitioning");
+      });
+      preloadHeroImage(heroSlides[(activeHeroIndex + 1) % heroSlides.length].image);
+    }, prefersReducedMotion ? 0 : 140);
+  });
 };
 
 const startHeroCarousel = () => {
   window.clearInterval(heroTimer);
-  heroTimer = window.setInterval(() => setHeroSlide((activeHeroIndex + 1) % heroSlides.length), 6500);
+  if (heroCarouselPaused || document.hidden || heroSlides.length < 2) return;
+  heroTimer = window.setInterval(() => setHeroSlide(activeHeroIndex + 1), 6500);
+};
+
+const selectHeroSlide = (index, { focus = false } = {}) => {
+  setHeroSlide(index);
+  if (focus) heroSlideButtons[(index + heroSlides.length) % heroSlides.length]?.focus();
+  startHeroCarousel();
 };
 
 const bindHeroSlideButtons = () => {
   heroSlideButtons = document.querySelectorAll("[data-hero-slide]");
   heroSlideButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-      setHeroSlide(Number(button.dataset.heroSlide || 0));
-      startHeroCarousel();
-    });
+    button.addEventListener("click", () => selectHeroSlide(Number(button.dataset.heroSlide || 0)));
   });
 };
+
+heroControls?.addEventListener("keydown", (event) => {
+  if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+  event.preventDefault();
+  selectHeroSlide(activeHeroIndex + (event.key === "ArrowRight" ? 1 : -1), { focus: true });
+});
+
+heroToggle?.addEventListener("click", () => {
+  heroCarouselPaused = !heroCarouselPaused;
+  updateHeroToggle();
+  startHeroCarousel();
+});
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) window.clearInterval(heroTimer);
+  else startHeroCarousel();
+});
+
+updateHeroToggle();
 
 const renderHeroControls = () => {
   if (!heroControls) return;
@@ -180,7 +294,7 @@ const renderHeroControls = () => {
     .map((slide, index) => {
       const activeClass = index === activeHeroIndex ? "active" : "";
       const label = escapeHtml(slide.label || slide.id || "Slide " + (index + 1));
-      return '<button class="' + activeClass + '" type="button" data-hero-slide="' + index + '"><span>' + String(index + 1).padStart(2, "0") + '</span>' + label + '</button>';
+      return '<button class="' + activeClass + '" type="button" data-hero-slide="' + index + '" aria-pressed="' + (index === activeHeroIndex ? 'true' : 'false') + '"><span>' + String(index + 1).padStart(2, "0") + '</span>' + label + '</button>';
     })
     .join("");
   bindHeroSlideButtons();
@@ -189,9 +303,10 @@ const renderHeroControls = () => {
 const hydrateHeroSlides = (slides) => {
   if (!Array.isArray(slides) || slides.length === 0) return;
   heroSlides = slides.slice(0, 5);
-  activeHeroIndex = 0;
+  const preservedHeroIndex = Math.min(activeHeroIndex, heroSlides.length - 1);
+  activeHeroIndex = preservedHeroIndex;
   renderHeroControls();
-  setHeroSlide(0);
+  setHeroSlide(preservedHeroIndex);
   startHeroCarousel();
 };
 
@@ -367,6 +482,7 @@ const openDemoModal = () => {
   pendingDemoUrl = product.demoUrl || `product-demo.html?product=${activeProductId}`;
   if (demoMessage) demoMessage.value = `I would like to sign up and watch a demo for: ${product.title}`;
 
+  rememberFocus();
   demoModal.classList.add("open");
   demoModal.setAttribute("aria-hidden", "false");
   demoModal.removeAttribute("inert");
@@ -375,11 +491,12 @@ const openDemoModal = () => {
 };
 
 const closeDemoModal = () => {
-  if (!demoModal) return;
+  if (!demoModal?.classList.contains("open")) return;
   demoModal.classList.remove("open");
   demoModal.setAttribute("aria-hidden", "true");
   demoModal.setAttribute("inert", "");
   document.body.classList.remove("modal-open");
+  restoreFocus();
 };
 
 const productGuides = {
@@ -535,6 +652,7 @@ const restoreChatHistory = () => {
 };
 const openChatPanel = () => {
   if (!chatPanel) return;
+  rememberFocus();
   chatPanel.classList.add("open");
   chatPanel.setAttribute("aria-hidden", "false");
   chatPanel.removeAttribute("inert");
@@ -544,16 +662,18 @@ const openChatPanel = () => {
 };
 
 const closeChatPanel = () => {
-  if (!chatPanel) return;
+  if (!chatPanel?.classList.contains("open")) return;
   chatPanel.classList.remove("open");
   chatPanel.setAttribute("aria-hidden", "true");
   chatPanel.setAttribute("inert", "");
   supportChatButton?.classList.remove("active");
   supportChatButton?.setAttribute("aria-expanded", "false");
+  restoreFocus();
 };
 
 const openLeadBuilder = (productId = activeProductId) => {
   if (!leadBuilder) return;
+  rememberFocus();
   const select = leadBuilder.querySelector('select[name="product"]');
   const productMap = {
     law: "CRM",
@@ -575,11 +695,12 @@ const openLeadBuilder = (productId = activeProductId) => {
 };
 
 const closeLeadBuilder = () => {
-  if (!leadBuilder) return;
+  if (!leadBuilder?.classList.contains("open")) return;
   leadBuilder.classList.remove("open");
   leadBuilder.setAttribute("aria-hidden", "true");
   leadBuilder.setAttribute("inert", "");
   document.body.classList.remove("modal-open");
+  restoreFocus();
 };
 
 let chatBusy = false;
@@ -837,12 +958,18 @@ const syncHeader = () => {
 window.addEventListener("scroll", syncHeader);
 syncHeader();
 
+const closeMenu = () => {
+  header.classList.remove("open");
+  menuButton.setAttribute("aria-expanded", "false");
+};
+
 menuButton.addEventListener("click", () => {
-  header.classList.toggle("open");
+  const isOpen = header.classList.toggle("open");
+  menuButton.setAttribute("aria-expanded", isOpen ? "true" : "false");
 });
 
 document.querySelectorAll(".nav-links a, .nav-cta").forEach((link) => {
-  link.addEventListener("click", () => header.classList.remove("open"));
+  link.addEventListener("click", closeMenu);
 });
 
 tabs.forEach((tab) => {
@@ -865,7 +992,11 @@ document.addEventListener("click", (event) => {
 productDemo?.addEventListener("click", openDemoModal);
 document.querySelectorAll("[data-demo-close]").forEach((item) => item.addEventListener("click", closeDemoModal));
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") closeDemoModal();
+  if (event.key !== "Escape") return;
+  closeMenu();
+  if (leadBuilder?.classList.contains("open")) closeLeadBuilder();
+  else if (demoModal?.classList.contains("open")) closeDemoModal();
+  else if (chatPanel?.classList.contains("open")) closeChatPanel();
 });
 
 demoForm?.addEventListener("submit", async (event) => {
@@ -922,6 +1053,7 @@ contactForm.addEventListener("submit", async (event) => {
 
   button.textContent = "Sending...";
   button.disabled = true;
+  if (contactStatus) contactStatus.textContent = "Sending your consultation request...";
 
   try {
     const response = await fetch("/api/contact", {
@@ -932,11 +1064,13 @@ contactForm.addEventListener("submit", async (event) => {
     const result = await response.json();
 
     button.textContent = result.ok ? "Request received" : "Check your details";
+    if (contactStatus) contactStatus.textContent = result.ok ? "Thank you. BizYako will contact you shortly." : (result.message || "Please check your details and try again.");
     if (result.ok) {
       contactForm.reset();
       prepareSecureForm(contactForm);
     }
   } catch (error) {
+    if (contactStatus) contactStatus.textContent = "We could not send this online. Opening your email app instead.";
     openEmailFallback(payload, button, "Request consultation");
     return;
   }

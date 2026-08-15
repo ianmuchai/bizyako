@@ -14,11 +14,50 @@ const publicFiles = [
   "product-demo.js",
   "service-worker.js",
   "manifest.webmanifest",
+  "robots.txt",
+  "sitemap.xml",
   path.join("data", "site-static.json"),
   path.join(".well-known", "security.txt"),
 ];
 
 const publicDirectories = ["assets"];
+
+const PERFORMANCE_BUDGETS = Object.freeze({
+  files: Object.freeze({
+    "index.html": 45 * 1024,
+    "styles.css": 110 * 1024,
+    "script.js": 70 * 1024,
+    "assets/bizyako-carousel-impact.webp": 150 * 1024,
+  }),
+  firstView: 400 * 1024,
+  firstViewFiles: Object.freeze([
+    "index.html",
+    "styles.css",
+    "script.js",
+    "chat-history.js",
+    "assets/bizyako-logo.png",
+    "assets/bizyako-carousel-impact.webp",
+  ]),
+});
+
+function enforcePerformanceBudgets(root) {
+  for (const [relativePath, limit] of Object.entries(PERFORMANCE_BUDGETS.files)) {
+    const bytes = fs.statSync(path.join(root, relativePath)).size;
+    if (bytes > limit) {
+      throw new Error(`Performance budget exceeded for ${relativePath}: ${bytes} > ${limit} bytes.`);
+    }
+  }
+
+  const firstViewBytes = PERFORMANCE_BUDGETS.firstViewFiles.reduce(
+    (total, relativePath) => total + fs.statSync(path.join(root, relativePath)).size,
+    0
+  );
+  if (firstViewBytes > PERFORMANCE_BUDGETS.firstView) {
+    throw new Error(`First-view performance budget exceeded: ${firstViewBytes} > ${PERFORMANCE_BUDGETS.firstView} bytes.`);
+  }
+
+  return { firstViewBytes };
+}
 
 function copyRequiredFile(root, output, relativePath) {
   const source = path.join(root, relativePath);
@@ -36,6 +75,8 @@ function buildStaticOutput({ root = path.join(__dirname, ".."), output = path.jo
   if (resolvedOutput === resolvedRoot) {
     throw new Error("Vercel output directory cannot be the project root.");
   }
+
+  enforcePerformanceBudgets(resolvedRoot);
 
   fs.rmSync(resolvedOutput, { recursive: true, force: true });
   fs.mkdirSync(resolvedOutput, { recursive: true });
@@ -59,4 +100,10 @@ if (require.main === module) {
   process.stdout.write(`Prepared allowlisted Vercel output at ${result.output}\n`);
 }
 
-module.exports = { buildStaticOutput, publicDirectories, publicFiles };
+module.exports = {
+  PERFORMANCE_BUDGETS,
+  buildStaticOutput,
+  enforcePerformanceBudgets,
+  publicDirectories,
+  publicFiles,
+};

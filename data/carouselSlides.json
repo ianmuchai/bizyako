@@ -2,7 +2,7 @@
   {
     "id": "suite",
     "label": "Suite",
-    "image": "assets/bizyako-carousel-impact.png",
+    "image": "assets/bizyako-carousel-impact.webp",
     "kicker": "Your Business, Powered by AI.",
     "status": "Unified suite live",
     "title": "Business software that feels built for you.",
@@ -15,7 +15,7 @@
   {
     "id": "automation",
     "label": "Automation",
-    "image": "assets/bizyako-carousel-growth.png",
+    "image": "assets/bizyako-carousel-growth.webp",
     "kicker": "Automation without the chaos",
     "status": "AI workflows ready",
     "title": "Turn repetitive operations into guided, intelligent workflows.",
@@ -29,7 +29,7 @@
   {
     "id": "intelligence",
     "label": "Intelligence",
-    "image": "assets/bizyako-carousel-wave.png",
+    "image": "assets/bizyako-carousel-wave.webp",
     "kicker": "Data that managers can act on",
     "status": "Decision layer online",
     "title": "From POS to ERP to analytics, your business finally speaks one language.",
@@ -43,7 +43,7 @@
   {
     "id": "operations",
     "label": "Operations",
-    "image": "assets/bizyako-carousel-impact.png",
+    "image": "assets/bizyako-carousel-impact.webp",
     "kicker": "Operations connected end to end",
     "status": "ERP layer active",
     "title": "Run approvals, stock, finance, teams, and reports from one connected workspace.",
@@ -57,7 +57,7 @@
   {
     "id": "retail",
     "label": "Retail",
-    "image": "assets/bizyako-carousel-growth.png",
+    "image": "assets/bizyako-carousel-growth.webp",
     "kicker": "Sales, stock, and branches in sync",
     "status": "POS stack ready",
     "title": "Give front-office teams speed while management gets real visibility.",
